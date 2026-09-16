@@ -5,16 +5,15 @@ import threading
 
 BOT_TOKEN = os.environ.get("BOT_TOKEN")
 bot = telebot.TeleBot(BOT_TOKEN)
-
 app = Flask(__name__)
 
 @bot.message_handler(commands=['start'])
 def start(message):
-    bot.reply_to(message, "Sannu! Bot yana aiki akan Render ✅")
+    bot.reply_to(message, "🎉 Barka da zuwa Real Referral Ads!\n\nBot yana aiki 100% ✅\nKa tura /help don taimako")
 
-@bot.message_handler(func=lambda m: True)
-def echo(message):
-    bot.reply_to(message, f"Ka ce: {message.text}")
+@bot.message_handler(commands=['help'])
+def help(message):
+    bot.reply_to(message, "Commands:\n/start - Fara\n/help - Taimako")
 
 @app.route('/')
 def home():

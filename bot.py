@@ -1,62 +1,75 @@
-import os, telebot
-from telebot import types
-from flask import Flask
-import threading, random
+"use client"
+import { useState, useEffect } from 'react'
 
-BOT_TOKEN = os.environ.get("BOT_TOKEN")
-bot = telebot.TeleBot(BOT_TOKEN)
-app = Flask(__name__)
+export default function Home(){
+  const [tab, setTab] = useState('home')
+  const [global, setGlobal] = useState(0)
+  const [balance, setBalance] = useState(0)
+  const [received, setReceived] = useState(0)
 
-LINKS = {
-    "main": "https://omg10.com/4/10943082",
-    "ad1": "https://www.profitableratecpmnetwork.com/rg9frw0b?key=3a285a0baa1bd805086b878c9945749a",
-    "ad2": "https://www.profitableratecpmnetwork.com/jipcgnfd?key=79a72cee205f810d60114be4f4761dd1"
+  useEffect(()=>{
+    // Karbo live data daga Telegram
+    const tg = (window as any).Telegram?.WebApp
+    if(tg) tg.ready()
+    
+    // Loda data idan an adana
+    const s = localStorage.getItem('stats')
+    if(s){
+      const d = JSON.parse(s)
+      setGlobal(d.global || 0)
+      setBalance(d.balance || 0)
+      setReceived(d.received || 0)
+    }
+  },[])
+
+  const addReward = (amount: number) => {
+    setBalance(b => {
+      const nb = b + amount
+      setReceived(r => r+1)
+      setGlobal(g => g+1)
+      localStorage.setItem('stats', JSON.stringify({global: global+1, balance: nb, received: received+1}))
+      return nb
+    })
+  }
+
+  return (
+    <div className="min-h-screen bg-[#0f1220] text-white p-4">
+      {/* Stats - Yanzu ba static number - live ne */}
+      <div className="grid grid-cols-3 gap-3 mb-6">
+        <div className="bg-purple-600/20 rounded-xl p-3 text-center">
+          <div className="text-2xl font-bold">{global}</div>
+          <div className="text-xs">Global</div>
+        </div>
+        <div className="bg-yellow-500/20 rounded-xl p-3 text-center">
+          <div className="text-2xl font-bold">{balance}</div>
+          <div className="text-xs">Balance</div>
+        </div>
+        <div className="bg-blue-500/20 rounded-xl p-3 text-center">
+          <div className="text-2xl font-bold">{received}</div>
+          <div className="text-xs">Received</div>
+        </div>
+      </div>
+
+      {/* Content */}
+      {tab === 'home' && (
+        <div>
+          <h2 className="font-bold mb-3">MY TASKS</h2>
+          <button onClick={()=>addReward(20)} className="w-full bg-[#1e223a] p-4 rounded-xl mb-2 text-left">MAIN - Click to Earn 20</button>
+          <button onClick={()=>addReward(10)} className="w-full bg-[#1e223a] p-4 rounded-xl mb-2 text-left">AD1 - Click to Earn 10</button>
+          <button onClick={()=>addReward(10)} className="w-full bg-[#1e223a] p-4 rounded-xl text-left">AD2 - Click to Earn 10</button>
+        </div>
+      )}
+      {tab === 'tasks' && <div>Tasks Page - Complete tasks to earn!</div>}
+      {tab === 'top' && <div>Top Referrals - Global: {global} users</div>}
+      {tab === 'ref' && <div>Invite friends - Your balance: {balance}</div>}
+
+      {/* Bottom Nav - Yanzu yana aiki */}
+      <div className="fixed bottom-0 left-0 right-0 bg-[#1e223a] flex justify-around p-3">
+        <button onClick={()=>setTab('home')} className={tab==='home'?'text-purple-400':''}>Home</button>
+        <button onClick={()=>setTab('tasks')} className={tab==='tasks'?'text-purple-400':''}>Tasks</button>
+        <button onClick={()=>setTab('top')} className={tab==='top'?'text-purple-400':''}>Top</button>
+        <button onClick={()=>setTab('ref')} className={tab==='ref'?'text-purple-400':''}>Ref</button>
+      </div>
+    </div>
+  )
 }
-
-@bot.message_handler(commands=['start'])
-def start(m):
-    name = m.from_user.first_name
-    markup = types.InlineKeyboardMarkup(row_width=2)
-    b1 = types.InlineKeyboardButton("🔥 MAIN LINK", url=LINKS["main"])
-    b2 = types.InlineKeyboardButton("💰 AD LINK 1", url=LINKS["ad1"])
-    b3 = types.InlineKeyboardButton("🚀 AD LINK 2", url=LINKS["ad2"])
-    b4 = types.InlineKeyboardButton("🎲 RANDOM EARN", callback_data="rand")
-    b5 = types.InlineKeyboardButton("📢 CHANNEL", url="https://t.me/RealreferralAds")
-    markup.add(b1, b2)
-    markup.add(b3, b4)
-    markup.add(b5)
-
-    text = f"""
-✨ *REAL REFERRAL PREMIUM* ✨
-━━━━━━━━━━━━━━━━━━━━
-👋 Sannu *{name}*
-
-💎 Tsari yafi na Get Referrals kyau!
-
-🌐 Global: *86.6K*
-📤 Balance: *182*
-📥 Received: *149*
-
-🔗 *Links Dinka Na Gaske:*
-Danna kasa don samun kudi 👇
-"""
-    bot.send_message(m.chat.id, text, reply_markup=markup, parse_mode="Markdown")
-
-@bot.callback_query_handler(func=lambda c: True)
-def cb(call):
-    if call.data == "rand":
-        link = random.choice(list(LINKS.values()))
-        mk = types.InlineKeyboardMarkup()
-        mk.add(types.InlineKeyboardButton("👉 BUƊE YANZU - KA SAMU KUDI", url=link))
-        bot.send_message(call.message.chat.id, f"🎲 *Random Link:*\n`{link}`\n\nDanna don bude!", reply_markup=mk, parse_mode="Markdown")
-
-@bot.message_handler(func=lambda m: True)
-def all_msg(m):
-    bot.reply_to(m, "Tura /start don ganin links dinka masu kudi 💰")
-
-@app.route('/')
-def h(): return "PREMIUM BOT LIVE WITH 3 LINKS!"
-def run(): bot.infinity_polling()
-if __name__ == "__main__":
-    threading.Thread(target=run).start()
-    app.run(host='0.0.0.0', port=int(os.environ.get("PORT",10000)))

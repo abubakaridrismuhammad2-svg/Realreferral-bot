@@ -1,6 +1,0 @@
-{
-  "builds": [
-    { "src": "api/bot.py", "use": "@vercel/python" },
-    { "src": "app/page.tsx", "use": "@vercel/next" }
-  ]
-}

@@ -2,6 +2,6 @@
   "name": "realreferral-bot",
   "version": "1.0.0",
   "dependencies": {
-    "telegraf": "^4.15.0"
+    "node-telegram-bot-api": "^0.64.0"
   }
 }

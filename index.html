@@ -3,36 +3,80 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RealReferral</title>
+<title>RealReferral PREMIUM</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
-body{background:#0f0f0f;color:white;font-family:Arial;text-align:center;margin:0;padding:20px}
-.card{background:#1c1c1c;border-radius:20px;padding:20px;margin:15px 0;border:1px solid #2a2a2a}
-.balance{font-size:32px;font-weight:bold;color:#a855f7}
-.logo{width:90px;height:90px;border-radius:50%;margin:0 auto 15px;display:block;box-shadow:0 0 20px rgba(168,85,247,.5)}
-.btn{background:linear-gradient(45deg,#7c3aed,#fb923c);border:none;padding:14px;border-radius:12px;color:white;font-weight:bold;width:100%;margin-top:12px}
-.flex{display:flex;justify-content:space-around;background:#1c1c1c;padding:15px;border-radius:15px;margin:15px 0}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Outfit',Arial}
+body{background:#0a0a0f;color:white;min-height:100vh;padding:18px;padding-bottom:100px;overflow-x:hidden;position:relative}
+body::before{content:'';position:fixed;top:-50%;left:-30%;width:160%;height:160%;background:radial-gradient(circle at 20% 30%, rgba(124,58,237,0.25) 0%, transparent 50%), radial-gradient(circle at 80% 70%, rgba(249,115,22,0.2) 0%, transparent 50%), radial-gradient(circle at 50% 50%, rgba(59,130,246,0.15) 0%, transparent 60%);pointer-events:none;z-index:-1}
+/* SPLASH */
+#splash{position:fixed;inset:0;background:#0a0a0f;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .6s, transform .6s}
+#splash.hide{opacity:0;transform:scale(1.1);pointer-events:none}
+.splash-logo{width:110px;height:110px;border-radius:28px;overflow:hidden;box-shadow:0 0 40px rgba(124,58,237,.6), 0 0 80px rgba(249,115,22,.3);animation:splashPulse 1.5s ease-in-out infinite}
+.splash-logo img{width:100%;height:100%;object-fit:cover}
+@keyframes splashPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+.splash-text{margin-top:20px;font-weight:800;font-size:20px;letter-spacing:1px;background:linear-gradient(90deg,#8b5cf6,#f59e0b);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.splash-loader{margin-top:15px;width:40px;height:3px;background:rgba(255,255,255,.1);border-radius:10px;overflow:hidden}
+.splash-loader div{width:50%;height:100%;background:linear-gradient(90deg,#8b5cf6,#f59e0b);animation:load 1s infinite}
+@keyframes load{0%{transform:translateX(-100%)}100%{transform:translateX(200%)}}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px}
+.user-box{display:flex;gap:12px;align-items:center}
+.avatar{width:52px;height:52px;border-radius:16px;overflow:hidden;border:2px solid rgba(168,85,247,.5);box-shadow:0 0 20px rgba(168,85,247,.4)}
+.avatar img{width:100%;height:100%;object-fit:cover}
+.user-box h2{font-size:18px;font-weight:800}.user-box small{color:#9ca3af;font-size:12px}
+.crown-btn{width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,#f59e0b,#fbbf24);display:flex;align-items:center;justify-content:center;box-shadow:0 5px 15px rgba(245,158,11,.4);font-size:20px}
+.stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:30px}
+.stat{border-radius:22px;padding:16px;position:relative;overflow:hidden;border:1px solid rgba(255,255,255,.1);backdrop-filter:blur(10px)}
+.purple{background:linear-gradient(135deg, rgba(139,92,246,0.9), rgba(76,29,149,0.9));box-shadow:0 10px 30px rgba(139,92,246,.4)}
+.orange{background:linear-gradient(135deg, rgba(249,115,22,0.9), rgba(194,65,12,0.9));box-shadow:0 10px 30px rgba(249,115,22,.4)}
+.blue{background:linear-gradient(135deg, rgba(59,130,246,0.9), rgba(29,78,216,0.9));box-shadow:0 10px 30px rgba(59,130,246,.4)}
+.stat-icon{width:32px;height:32px;border-radius:10px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;margin-bottom:12px}
+.stat-num{font-size:24px;font-weight:800}.stat-label{font-size:11px;opacity:.8;margin-top:2px;text-transform:uppercase}
+.section-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.section-title h3{font-size:13px;letter-spacing:2px;color:#6b7280}
+.live-dot{width:8px;height:8px;background:#10b981;border-radius:50%;display:inline-block;margin-right:6px;box-shadow:0 0 10px #10b981;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.task{background:rgba(255,255,255,.06);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:16px;display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.task-info .tag{font-size:9px;padding:4px 8px;border-radius:6px;font-weight:800;margin-bottom:8px;display:inline-block}
+.tag-main{background:rgba(16,185,129,.2);color:#6ee7b7;border:1px solid rgba(16,185,129,.3)}
+.tag-ad1{background:rgba(59,130,246,.2);color:#93c5fd;border:1px solid rgba(59,130,246,.3)}
+.tag-ad2{background:rgba(236,72,153,.2);color:#f9a8d4;border:1px solid rgba(236,72,153,.3)}
+.task-info h4{font-size:15px;font-weight:700}.task-info p{font-size:12px;color:#9ca3af}
+.open{background:linear-gradient(135deg,#fff,#e5e7eb);color:#111;padding:10px 20px;border-radius:12px;border:none;font-weight:800;font-size:13px}
+.open-premium{background:linear-gradient(135deg,#7c3aed,#ec4899);color:white;box-shadow:0 4px 15px rgba(124,58,237,.4)}
+.nav{position:fixed;bottom:12px;left:12px;right:12px;background:rgba(20,20,25,.85);backdrop-filter:blur(30px);border:1px solid rgba(255,255,255,.1);border-radius:28px;display:flex;justify-content:space-around;padding:10px 6px}
+.nav div{text-align:center;opacity:.4}.nav div.active{opacity:1}.nav div.active .nav-ico{background:white;color:black}
+.nav-ico{width:42px;height:42px;border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 4px;font-size:18px}
+.nav small{font-size:10px;font-weight:700}
 </style>
 </head>
 <body>
-<img src="logo.png" class="logo">
-<h2>RealReferral</h2>
-<div class="flex">
-<div><div id="globalCount">0</div><small>Global</small></div>
-<div><div id="balanceCount" class="balance">0</div><small>Balance</small></div>
-<div><div id="receivedCount">0</div><small>Received</small></div>
+<div id="splash">
+<div class="splash-logo"><img src="logo.png"></div>
+<div class="splash-text">RealReferral</div>
+<div class="splash-loader"><div></div></div>
 </div>
-<div class="card">
-<button class="btn" onclick="doTask('MAIN',10)">MAIN - Get 10</button>
-<button class="btn" style="background:#2a2a2a;margin-top:8px" onclick="doTask('AD1',5)">AD1 - Get 5</button>
+
+<div class="top">
+<div class="user-box">
+<div class="avatar"><img src="logo.png"></div>
+<div><small>Good evening 🔥</small><h2 id="name">Abubakar</h2></div>
 </div>
-<script>
-const tg=Telegram.WebApp;tg.ready();tg.expand();
-const uid=tg.initDataUnsafe?.user?.id||'guest';
-let data=JSON.parse(localStorage.getItem('rr_'+uid)||'{"balance":182,"received":149,"global":86600}');
-function anim(id,t){let c=0,s=t/40,el=document.getElementById(id);let tm=setInterval(()=>{c+=s;if(c>=t){c=t;clearInterval(tm);}el.innerText=id=='globalCount'?(c/1000).toFixed(1)+'K':Math.floor(c)},25)}
-anim('globalCount',data.global);anim('balanceCount',data.balance);anim('receivedCount',data.received);
-function doTask(n,a){data.balance+=a;data.received+=a;data.global+=1;localStorage.setItem('rr_'+uid,JSON.stringify(data));document.getElementById('balanceCount').innerText=data.balance;document.getElementById('receivedCount').innerText=data.received;document.getElementById('globalCount').innerText=(data.global/1000).toFixed(1)+'K';tg.showAlert('Ka samu +'+a+' daga '+n)}
-</script>
-</body>
-</html>
+<div class="crown-btn">👑</div>
+</div>
+
+<div class="stats">
+<div class="stat purple"><div class="stat-icon">🌐</div><div class="stat-num" id="g">0</div><div class="stat-label">Global</div></div>
+<div class="stat orange"><div class="stat-icon">💎</div><div class="stat-num" id="b">0</div><div class="stat-label">Balance</div></div>
+<div class="stat blue"><div class="stat-icon">🎁</div><div class="stat-num" id="r">0</div><div class="stat-label">Received</div></div>
+</div>
+
+<div class="section-title"><h3><span class="live-dot"></span>MY TASKS</h3><small style="color:#6b7280">3 Active</small></div>
+
+<div class="task">
+<div class="task-info"><span class="tag tag-main">MAIN • HOT</span><h4>Complete Main Offer</h4><p>Earn instantly + boost</p></div>
+<button class="open open-premium" onclick="doTask('MAIN',10)">Open →</button>
+</div>
+<div class="task">
+<div class="task-info"><span class="tag tag-ad1">AD 1 • EASY</span><h4>Sponsor Visit</h

@@ -7,49 +7,32 @@
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
 body{background:#0f0f0f;color:white;font-family:Arial;text-align:center;margin:0;padding:20px}
-.card{background:#1c1c1c;border-radius:20px;padding:20px;margin:15px 0}
+.card{background:#1c1c1c;border-radius:20px;padding:20px;margin:15px 0;border:1px solid #2a2a2a}
 .balance{font-size:32px;font-weight:bold;color:#a855f7}
-.logo{width:80px;height:80px;border-radius:50%;background:linear-gradient(45deg,#7c3aed,#fb923c);display:flex;align-items:center;justify-content:center;margin:0 auto 15px;font-size:40px}
-.btn{background:linear-gradient(45deg,#7c3aed,#fb923c);border:none;padding:12px 25px;border-radius:12px;color:white;font-weight:bold;width:100%;margin-top:10px}
-.flex{display:flex;justify-content:space-around}
+.logo{width:90px;height:90px;border-radius:50%;margin:0 auto 15px;display:block;box-shadow:0 0 20px rgba(168,85,247,.5)}
+.btn{background:linear-gradient(45deg,#7c3aed,#fb923c);border:none;padding:14px;border-radius:12px;color:white;font-weight:bold;width:100%;margin-top:12px}
+.flex{display:flex;justify-content:space-around;background:#1c1c1c;padding:15px;border-radius:15px;margin:15px 0}
 </style>
 </head>
 <body>
-<div class="logo">R</div>
+<img src="logo.png" class="logo">
 <h2>RealReferral</h2>
-
 <div class="flex">
-  <div><div id="globalCount">86.6K</div><small>Global</small></div>
-  <div><div id="balanceCount" class="balance">0</div><small>Balance</small></div>
-  <div><div id="receivedCount">0</div><small>Received</small></div>
+<div><div id="globalCount">0</div><small>Global</small></div>
+<div><div id="balanceCount" class="balance">0</div><small>Balance</small></div>
+<div><div id="receivedCount">0</div><small>Received</small></div>
 </div>
-
 <div class="card">
-  <h3>Tasks</h3>
-  <button class="btn" onclick="doTask('MAIN',10)">MAIN - Get 10</button>
-  <button class="btn" onclick="doTask('AD1',5)">AD1 - Get 5</button>
+<button class="btn" onclick="doTask('MAIN',10)">MAIN - Get 10</button>
+<button class="btn" style="background:#2a2a2a;margin-top:8px" onclick="doTask('AD1',5)">AD1 - Get 5</button>
 </div>
-
 <script>
-const tg = window.Telegram.WebApp;
-tg.ready();
-const userId = tg.initDataUnsafe?.user?.id || '7741288581';
-let data = JSON.parse(localStorage.getItem('rr_'+userId) || '{"balance":182,"received":149,"global":86600}');
-
-function updateUI(){
-  document.getElementById('balanceCount').innerText = data.balance;
-  document.getElementById('receivedCount').innerText = data.received;
-  document.getElementById('globalCount').innerText = (data.global/1000).toFixed(1)+'K';
-}
-updateUI();
-
-function doTask(name, amount){
-  data.balance += amount;
-  data.global += 1;
-  localStorage.setItem('rr_'+userId, JSON.stringify(data));
-  updateUI();
-  tg.showAlert('Ka samu +'+amount+' daga '+name);
-}
+const tg=Telegram.WebApp;tg.ready();tg.expand();
+const uid=tg.initDataUnsafe?.user?.id||'guest';
+let data=JSON.parse(localStorage.getItem('rr_'+uid)||'{"balance":182,"received":149,"global":86600}');
+function anim(id,t){let c=0,s=t/40,el=document.getElementById(id);let tm=setInterval(()=>{c+=s;if(c>=t){c=t;clearInterval(tm);}el.innerText=id=='globalCount'?(c/1000).toFixed(1)+'K':Math.floor(c)},25)}
+anim('globalCount',data.global);anim('balanceCount',data.balance);anim('receivedCount',data.received);
+function doTask(n,a){data.balance+=a;data.received+=a;data.global+=1;localStorage.setItem('rr_'+uid,JSON.stringify(data));document.getElementById('balanceCount').innerText=data.balance;document.getElementById('receivedCount').innerText=data.received;document.getElementById('globalCount').innerText=(data.global/1000).toFixed(1)+'K';tg.showAlert('Ka samu +'+a+' daga '+n)}
 </script>
 </body>
 </html>

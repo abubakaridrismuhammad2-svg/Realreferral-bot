@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>RealReferral Monetized V5</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial}body{background:#0a0a0f;color:#fff;padding:14px;padding-bottom:110px}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}.av{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#8b5cf6,#f59e0b);display:flex;align-items:center;justify-content:center;font-weight:900}
+.bal{background:rgba(255,255,255,.08);padding:8px 14px;border-radius:12px;font-weight:800}
+.card{background:rgba(255,255,255,.06);border:1px solid rgba(139,92,246,.2);border-radius:18px;padding:14px;margin-bottom:10px}
+.group-card{display:flex;align-items:center;gap:12px;padding:12px;border-radius:16px;margin-bottom:8px}
+.g1{background:linear-gradient(135deg,#0ea5e9,#0284c7)} .g2{background:linear-gradient(135deg,#8b5cf6,#7c3aed)} .g3{background:linear-gradient(135deg,#22c55e,#16a34a)}
+.g-icon{width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;font-weight:900}
+.btn{width:100%;padding:12px;border:none;border-radius:12px;font-weight:800;cursor:pointer}.btn-prem{background:linear-gradient(135deg,#8b5cf6,#ec4899);color:#fff}
+.btn-join{background:#fff;color:#000;padding:6px 14px;border-radius:20px;font-size:12px;border:none;font-weight:800}
+.input{width:100%;padding:11px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);color:#fff;margin-bottom:8px;outline:none}
+.page{display:none}.page.active{display:block}
+.nav{position:fixed;bottom:8px;left:8px;right:8px;background:rgba(18,18,22,.96);border:1px solid rgba(255,255,255,.1);border-radius:24px;display:flex;justify-content:space-around;padding:6px;z-index:100}
+.nav div{flex:1;text-align:center;opacity:.45;padding:6px;border-radius:14px;cursor:pointer}.nav div.active{opacity:1;background:rgba(255,255,255,.12)}
+.modal{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.85);display:none;align-items:center;justify-content:center;z-index:999;padding:20px}
+.modal.active{display:flex}
+.stats-row{display:flex;text-align:center}.stats-row>div{flex:1;border-right:1px solid rgba(255,255,255,.1)}.stats-row>div:last-child{border:none}
+.num{font-size:19px;font-weight:900}.lbl{font-size:9px;color:#9ca3af}
+.timer-circle{width:80px;height:80px;border-radius:50%;border:4px solid #8b5cf6;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:900;margin:14px auto}
+</style></head><body>
+<div class="top"><div style="display:flex;gap:10px;align-items:center"><div class="av">RE</div><div><small style="color:#9ca3af">Welcome</small><h3 id="uName">Abubakar</h3></div></div><div class="bal" id="balTop">💎 182</div></div>
+
+<div id="p-home" class="page active">
+<div class="card" style="padding:10px 6px"><div class="stats-row"><div><div>👁️</div><div class="lbl">Views</div><div class="num" id="g">0</div></div><div><div>💎</div><div class="lbl">Coins</div><div class="num" id="b">182</div></div><div><div>📈</div><div class="lbl">Earned</div><div class="num" id="r">0</div></div></div></div>
+
+<div class="card" style="border-color:#0ea5e9"><h4>👥 Join Our Communities</h4>
+<div class="group-card g1" onclick="openGroup('https://t.me/realreferralads1')"><div class="g-icon">RE</div><div style="flex:1"><b>RealreferralAds 1</b><br><small>Main Group</small></div><button class="btn-join">Join +5</button></div>
+<div class="group-card g2" onclick="openGroup('https://t.me/realreferralcommunity')"><div class="g-icon">RE</div><div style="flex:1"><b>Community</b><br><small>Support</small></div><button class="btn-join">Join +5</button></div>
+<div class="group-card g3" onclick="openGroup('https://t.me/realreferralads2')"><div class="g-icon">RE</div><div style="flex:1"><b>RealreferralAds 2</b><br><small>Backup</small></div><button class="btn-join">Join +5</button></div>
+</div>
+
+<div class="card"><h4>🚀 Create Ad - 1 Coin = 1 View</h4><input id="adTitle" class="input" placeholder="Title"><input id="adLink" class="input" placeholder="https://t.me/..."><input id="adViews" class="input" type="number" placeholder="Views"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:8px"><span>Cost: <b id="cost" style="color:#f59e0b">0</b></span><span>Bal: <b id="have">182</b></span></div><button class="btn btn-prem" onclick="createAd()">Publish</button></div>
+</div>
+
+<div id="p-tasks" class="page"><h3>⚡ Earn Coins (Monetized)</h3><p style="font-size:10px;color:#9ca3af;margin:6px 0">8 Links rotator - 15 sec timer</p><div id="tasksList"></div></div>
+<div id="p-posts" class="page"><h3>💎 Premium & Buy Coins</h3><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><div class="card" style="text-align:center" onclick="buyCoins(50)"><b>50 Coins</b><br>₦500</div><div class="card" style="text-align:center" onclick="buyCoins(100)"><b>100</b><br>₦900</div><div class="card" style="text-align:center" onclick="buyCoins(250)"><b>250</b><br>₦2000</div><div class="card" style="text-align:center" onclick="buyCoins(500)"><b>500</b><br>₦3500</div></div><div id="adsList" style="margin-top:12px"></div></div>
+<div id="p-top" class="page"><h3>👥 Groups</h3><button class="btn btn-prem" style="margin-bottom:8px" onclick="openGroup('https://t.me/realreferralads1')">Join Ads 1</button><button class="btn" style="background:#8b5cf6;color:#fff;margin-bottom:8px" onclick="openGroup('https://t.me/realreferralcommunity')">Join Community</button><button class="btn" style="background:#22c55e;color:#fff" onclick="openGroup('https://t.me/realreferralads2')">Join Ads 2</button></div>
+<div id="p-refs" class="page"><div class="card" style="background:linear-gradient(135deg,#8b5cf6,#3b82f6);text-align:center"><h3>Invite & Earn 10</h3><div id="refLink" style="background:rgba(0,0,0,.35);padding:10px;border-radius:10px;margin:10px 0;font-size:11px;word-break:break-all"></div><button class="btn" style="background:#fff;color:#000" onclick="copyRef()">Copy</button></div></div>
+
+<div class="nav"><div class="active" onclick="showPage('home',0)"><div>🏠</div><small>Home</small></div><div onclick="showPage('tasks',1)"><div>⚡</div><small>Tasks</small></div><div onclick="showPage('posts',2)"><div>💎</div><small>Premium</small></div><div onclick="showPage('top',3)"><div>👥</div><small>Groups</small></div><div onclick="showPage('refs',4)"><div>👤</div><small>Refs</small></div></div>
+
+<!-- TIMER MODAL -->
+<div id="timerModal" class="modal"><div class="card" style="width:100%;max-width:340px;text-align:center"><h3>⏳ Please Wait</h3><p style="font-size:12px;color:#9ca3af;margin:8px 0">Dole ka jira 15 seconds don Monetag/Adsterra su kirga!</p><div class="timer-circle" id="timerCircle">15</div><p style="font-size:11px;color:#f59e0b" id="timerText">Opening monetization link...</p><div style="background:rgba(255,255,255,.08);border-radius:10px;padding:8px;margin:10px 0;font-size:10px;word-break:break-all" id="currentMonetagLink"></div><button class="btn" id="claimAfterBtn" style="background:#22c55e;color:#fff;display:none" onclick="finishView()">✅ Claim +1 Coin</button></div></div>
+
+<script>
+const SUPABASE_URL="https://hgdxkzzgzmiropkrdfhm.supabase.co";const SUPABASE_KEY="sb_publishable_8jJGMNp-44jHaeJfe2MwNw_yv9x100O";
+const supa=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const tg=window.Telegram?Telegram.WebApp:null; if(tg){tg.ready();tg.expand();}
+const user=tg?.initDataUnsafe?.user||{id:12345,first_name:"Abubakar"};
+document.getElementById('uName').innerText=user.first_name;
+document.getElementById('refLink').innerText=`https://t.me/realreferralAdsbot?start=${user.id}`;
+
+// === 8 LINKS ROTATOR - NAKA ===
+const monetizationLinks = [
+"https://www.profitableratecpmnetwork.com/rg9frw0b?key=3a285a0baa1bd805086b878c9945749a",
+"https://www.profitableratecpmnetwork.com/jipcgnfd?key=79a72cee205f810d60114be4f4761dd1",
+"https://www.profitableratecpmnetwork.com/bmdtadg5pg?key=66bda5e5e2e88b4c29fffd6cc217a6ae",
+"https://www.profitableratecpmnetwork.com/kxibh57f73?key=af241f4ce58f6d75267ae7f41fe07ae2",
+"https://omg10.com/4/11920289",
+"https://omg10.com/4/11920288",
+"https://omg10.com/4/11920287",
+"https://omg10.com/4/10943082"
+];
+let rotatorIndex = parseInt(localStorage.getItem('rotatorIdx')||'0');
+function getNextMonetizationLink(){ let link = monetizationLinks[rotatorIndex % monetizationLinks.length]; rotatorIndex++; localStorage.setItem('rotatorIdx', rotatorIndex); return link; }
+
+let local=JSON.parse(localStorage.getItem('rr_v5')||'{"balance":182,"earned":0,"global":0}');
+let pendingAd=null;
+function save(){localStorage.setItem('rr_v5',JSON.stringify(local));ui();}
+function ui(){document.getElementById('b').innerText=local.balance;document.getElementById('balTop').innerText='💎 '+local.balance;document.getElementById('have').innerText=local.balance;document.getElementById('g').innerText=local.global;document.getElementById('r').innerText=local.earned;document.getElementById('cost').innerText=document.getElementById('adViews').value||0;}
+function openGroup(url){window.open(url,'_blank');}
+function showPage(p,i){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));document.getElementById('p-'+p).classList.add('active');document.querySelectorAll('.nav div').forEach((x,idx)=>x.classList.toggle('active',idx===i)); loadAds();}
+async function createAd(){let t=document.getElementById('adTitle').value.trim();let l=document.getElementById('adLink').value.trim();let v=parseInt(document.getElementById('adViews').value); if(!t||!l||!v) return alert('Cika duka'); if(local.balance<v) return alert('Coin bai kai ba'); local.balance-=v;save(); let {error}=await supa.from('ads').insert([{title:t,link:l,total_views:v,remaining:v,owner:user.id,owner_name:user.first_name}]); if(error){alert(error.message);local.balance+=v;save();return;} alert('Published!');document.getElementById('adTitle').value='';document.getElementById('adLink').value='';document.getElementById('adViews').value='';loadAds();}
+async function loadAds(){let {data:ads}=await supa.from('ads').select('*').order('created_at',{ascending:false}).limit(50); if(!ads) return; let avail=ads.filter(a=>a.remaining>0&&a.owner!=user.id); document.getElementById('tasksList').innerHTML=avail.length?avail.map(a=>`<div class="card" style="display:flex;justify-content:space-between;align-items:center"><div><b>${a.title}</b><br><small style="color:#9ca3af">${a.remaining} left • ${a.owner_name}</small></div><button class="btn btn-prem" style="width:auto;padding:8px 14px" onclick="viewAd(${a.id},'${a.link.replace(/'/g,'')}')">View +1</button></div>`).join(''):'<div style="text-align:center;color:#666;padding:20px">No ads - Be first to post!</div>'; document.getElementById('adsList').innerHTML=ads.map(a=>`<div class="card"><div style="display:flex;justify-content:space-between"><b>${a.title}</b><span style="font-size:10px;background:rgba(34,197,94,.2);color:#4ade80;padding:3px 8px;border-radius:20px">${a.remaining}/${a.total_views}</span></div><small style="color:#9ca3af;word-break:break-all">${a.link}</small></div>`).join(''); local.global=ads.reduce((s,a)=>s+(a.total_views-a.remaining),0); save();}
+async function viewAd(id,link){
+ let monetLink = getNextMonetizationLink();
+ pendingAd={id,link,monetLink};
+ document.getElementById('currentMonetagLink').innerText=monetLink;
+ document.getElementById('timerModal').classList.add('active');
+ document.getElementById('claimAfterBtn').style.display='none';
+ document.getElementById('timerText').innerText='Opening monetization link...';
+ // Bude monetization link nan da nan
+ window.open(monetLink,'_blank');
+ // Fara timer 15 sec
+ let sec=15; document.getElementById('timerCircle').innerText=sec;
+ let interval=setInterval(()=>{sec--; document.getElementById('timerCircle').innerText=sec; document.getElementById('timerText').innerText=`Jira ${sec}s - Kar ka rufe...`; if(sec<=0){clearInterval(interval); document.getElementById('timerText').innerText='✅ Yanzu bude main link!'; document.getElementById('claimAfterBtn').style.display='block'; window.open(link,'_blank');}},1000);
+}
+async function finishView(){
+ if(!pendingAd) return;
+ let {data:ad}=await supa.from('ads').select('*').eq('id',pendingAd.id).single();
+ if(ad && ad.remaining>0){ await supa.from('ads').update({remaining:ad.remaining-1}).eq('id',pendingAd.id); }
+ document.getElementById('timerModal').classList.remove('active');
+ local.balance+=1; local.earned+=1; save();
+ alert(`✅ +1 Coin! Monetization: ${pendingAd.monetLink.substring(0,30)}...`);
+ pendingAd=null; loadAds();
+}
+function buyCoins(amt){local.balance+=amt;save();alert(`+${amt} added`);}
+function copyRef(){navigator.clipboard.writeText(document.getElementById('refLink').innerText);alert('Copied');}
+ui();loadAds();
+</script></body></html>

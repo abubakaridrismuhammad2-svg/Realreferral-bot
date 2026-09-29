@@ -1,0 +1,37 @@
+async function loadAds(){
+let {data:ads}=await supa.from('ads').select('*').order('created_at',{ascending:false}).limit(50); 
+if(!ads) ads=[];
+let avail=ads.filter(a=>a.remaining>0&&a.owner!=user.id); 
+
+// FALLBACK - Idan babu ads, nuna monetization tasks na 8 links
+let fallbackTasks = [
+{title:"🔥 Visit Premium Offer #1", link:monetizationLinks[0]},
+{title:"💎 Check Hot Deal #2", link:monetizationLinks[1]},
+{title:"🚀 Special Promotion #3", link:monetizationLinks[2]},
+{title:"⭐ Daily Bonus #4", link:monetizationLinks[3]},
+{title:"💰 Earn Extra #5", link:monetizationLinks[4]}
+];
+
+let html = "";
+if(avail.length>0){
+html = avail.map(a=>`<div class="card" style="display:flex;justify-content:space-between;align-items:center"><div><b>${a.title}</b><br><small style="color:#9ca3af">${a.remaining} left • ${a.owner_name}</small></div><button class="btn btn-prem" style="width:auto;padding:8px 14px" onclick="viewAd(${a.id},'${a.link.replace(/'/g,'')}')">View +1</button></div>`).join('');
+}else{
+html = fallbackTasks.map((f,i)=>`<div class="card" style="display:flex;justify-content:space-between;align-items:center;border-color:#22c55e"><div><b>${f.title}</b><br><small style="color:#4ade80">Monetized • +1 coin • 15s</small></div><button class="btn" style="width:auto;padding:8px 14px;background:#22c55e;color:#fff" onclick="viewFallback('${f.link}')">Earn +1</button></div>`).join('');
+}
+document.getElementById('tasksList').innerHTML=html;
+
+document.getElementById('adsList').innerHTML=ads.map(a=>`<div class="card"><div style="display:flex;justify-content:space-between"><b>${a.title}</b><span style="font-size:10px;background:rgba(34,197,94,.2);color:#4ade80;padding:3px 8px;border-radius:20px">${a.remaining}/${a.total_views}</span></div><small style="color:#9ca3af;word-break:break-all">${a.link}</small></div>`).join(''); 
+local.global=ads.reduce((s,a)=>s+(a.total_views-a.remaining),0); 
+save();
+}
+
+async function viewFallback(link){
+let monetLink = getNextMonetizationLink();
+pendingAd={id:0,link:link,monetLink:monetLink};
+document.getElementById('currentMonetagLink').innerText=monetLink;
+document.getElementById('timerModal').classList.add('active');
+document.getElementById('claimAfterBtn').style.display='none';
+window.open(monetLink,'_blank');
+let sec=15; document.getElementById('timerCircle').innerText=sec;
+let interval=setInterval(()=>{sec--; document.getElementById('timerCircle').innerText=sec; document.getElementById('timerText').innerText=`Jira ${sec}s...`; if(sec<=0){clearInterval(interval); document.getElementById('timerText').innerText='✅ Claim now!'; document.getElementById('claimAfterBtn').style.display='block';}},1000);
+}

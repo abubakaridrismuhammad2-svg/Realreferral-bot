@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RealReferral - 1 Coin = 1 View Global</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial}body{background:#0a0a0f;color:#fff;padding:16px;padding-bottom:110px}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}.user{display:flex;gap:10px;align-items:center}
+.av{width:46px;height:46px;border-radius:14px;background:linear-gradient(135deg,#8b5cf6,#f59e0b);display:flex;align-items:center;justify-content:center;font-weight:900}
+.bal{background:rgba(255,255,255,.08);padding:8px 14px;border-radius:12px;font-weight:800}
+.stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px}.stat{border-radius:16px;padding:12px}.purple{background:linear-gradient(135deg,#8b5cf6,#4c1d95)}.orange{background:linear-gradient(135deg,#f59e0b,#c2410c)}.blue{background:linear-gradient(135deg,#3b82f6,#1d4ed8)}
+.num{font-size:20px;font-weight:800}.lbl{font-size:9px;opacity:.7}.page{display:none}.page.active{display:block}
+.card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:14px;margin-bottom:10px}
+.btn{padding:12px 16px;border-radius:10px;border:none;font-weight:800;font-size:13px;cursor:pointer}.btn-prem{background:linear-gradient(135deg,#7c3aed,#ec4899);color:#fff;width:100%}.btn-white{background:#fff;color:#000}
+.input{width:100%;padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.05);color:#fff;margin-bottom:8px;outline:none}
+.nav{position:fixed;bottom:8px;left:8px;right:8px;background:rgba(18,18,22,.96);border:1px solid rgba(255,255,255,.1);border-radius:24px;display:flex;justify-content:space-around;padding:6px 2px;z-index:100}
+.nav div{flex:1;text-align:center;opacity:.4;padding:6px;border-radius:14px;cursor:pointer}.nav div.active{opacity:1;background:rgba(255,255,255,.12)}
+.badge{font-size:10px;padding:3px 8px;border-radius:20px;font-weight:800}.green{background:rgba(34,197,94,.2);color:#4ade80}
+</style>
+</head>
+<body>
+<div class="top"><div class="user"><div class="av">R</div><div><small style="color:#9ca3af">Welcome</small><h2 id="uName">Loading...</h2></div></div><div class="bal" id="balTop">💎 0</div></div>
+
+<div id="p-home" class="page active">
+<div class="stats"><div class="stat purple"><div>🌐</div><div class="num" id="g">0</div><div class="lbl">TOTAL VIEWS</div></div><div class="stat orange"><div>💎</div><div class="num" id="b">0</div><div class="lbl">YOUR COINS</div></div><div class="stat blue"><div>🎁</div><div class="num" id="r">0</div><div class="lbl">EARNED</div></div></div>
+<div class="card" style="text-align:center;border-style:dashed"><h3>🚀 Promote Your Link</h3><p style="font-size:12px;color:#9ca3af;margin:8px 0">1 Coin = 1 Real View - Global Database Active!</p><button class="btn btn-prem" onclick="showPage('posts',2)">+ Create Ad Campaign</button></div>
+<div class="card"><h4>🔥 How it Works</h4><p style="font-size:12px;color:#ccc;margin-top:6px">1. Post link with views you need<br>2. 1 Coin = 1 View deducted<br>3. Others view it, your views decrease<br>4. View others ads to earn coins!</p></div>
+</div>
+
+<div id="p-tasks" class="page"><h2>⚡ Earn Coins</h2><p style="font-size:12px;color:#9ca3af;margin:6px 0 12px">View ads = 1 coin per view (Global)</p><div id="tasksList">Loading global ads...</div></div>
+
+<div id="p-posts" class="page">
+<h2>📢 Marketplace</h2><p style="font-size:12px;color:#9ca3af;margin:6px 0 12px">1 Coin = 1 View. Ad stops when views finish.</p>
+<div class="card"><h4>Create New Ad</h4>
+<input id="adTitle" class="input" placeholder="Title: e.g. Join My Channel"><input id="adLink" class="input" placeholder="https://t.me/..."><input id="adViews" class="input" type="number" placeholder="Views needed (e.g. 50)" oninput="updateCost()">
+<div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:10px"><span>Cost: <b id="cost" style="color:#f59e0b">0 coins</b></span><span>Balance: <b id="have">0</b></span></div>
+<button class="btn btn-prem" onclick="createAd()">Pay & Publish - 1 Coin = 1 View</button></div>
+<div id="adsList"></div>
+</div>
+
+<div id="p-top" class="page"><h2>🏆 Leaderboard</h2><div id="topList" style="margin-top:12px"><div class="card">Global leaderboard from database</div></div></div>
+<div id="p-refs" class="page"><div class="card" style="background:linear-gradient(135deg,#8b5cf6,#3b82f6);text-align:center"><h2>Invite & Earn 10 Coins</h2><p style="font-size:12px;margin:8px 0">Share your link, get 10 coins per friend!</p><div style="background:rgba(0,0,0,.35);border-radius:10px;padding:10px;margin:10px 0;word-break:break-all;font-size:12px" id="refLink"></div><button class="btn btn-white" onclick="copyRef()">Copy Link</button></div></div>
+
+<div class="nav">
+<div class="active" onclick="showPage('home',0)"><div>🏠</div><small>Home</small></div>
+<div onclick="showPage('tasks',1)"><div>⚡</div><small>Tasks</small></div>
+<div onclick="showPage('posts',2)"><div>📢</div><small>Posts</small></div>
+<div onclick="showPage('top',3)"><div>🏆</div><small>Top</small></div>
+<div onclick="showPage('refs',4)"><div>👥</div><small>Refs</small></div>
+</div>
+
+<script>
+const SUPABASE_URL = "https://hgdxkzzgzmiropkrdfhm.supabase.co";
+const SUPABASE_KEY = "sb_publishable_8jJGMNp-44jHaeJfe2MwNw_yv9x100O";
+const supa = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const tg = window.Telegram ? Telegram.WebApp : null;
+if(tg){ tg.ready(); tg.expand(); }
+const user = tg?.initDataUnsafe?.user || {id: 12345, first_name:"Abubakar"};
+document.getElementById('uName').innerText=user.first_name;
+document.getElementById('refLink').innerText=`https://t.me/realreferralAdsbot?start=${user.id}`;
+let local = JSON.parse(localStorage.getItem('rr_final')||'{"balance":182,"earned":0,"global":0}');
+function saveLocal(){localStorage.setItem('rr_final',JSON.stringify(local)); updateUI();}
+function updateUI(){document.getElementById('b').innerText=local.balance;document.getElementById('balTop').innerText='💎 '+local.balance;document.getElementById('have').innerText=local.balance;document.getElementById('g').innerText=local.global;document.getElementById('r').innerText=local.earned;document.getElementById('cost').innerText=(parseInt(document.getElementById('adViews').value)||0)+' coins';}
+updateUI(); function updateCost(){updateUI();}
+function showPage(p,i){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));document.getElementById('p-'+p).classList.add('active');document.querySelectorAll('.nav div').forEach((x,idx)=>x.classList.toggle('active',idx===i)); if(p!=='home') loadAds();}
+async function createAd(){
+ let title=document.getElementById('adTitle').value.trim(); let link=document.getElementById('adLink').value.trim(); let views=parseInt(document.getElementById('adViews').value);
+ if(!title||!link||!views) return alert('Fill all fields');
+ if(local.balance < views) return alert(`Need ${views} coins, you have ${local.balance}. 1 coin = 1 view`);
+ if(!link.startsWith('http')) return alert('Link must start with https://');
+ local.balance-=views; saveLocal();
+ let {error}=await supa.from('ads').insert([{title,link,total_views:views,remaining:views,owner:user.id,owner_name:user.first_name}]);
+ if(error){ alert('Error: '+error.message); local.balance+=views; saveLocal(); return; }
+ alert(`Published! ${views} views for ${views} coins. Global!`); 
+ document.getElementById('adTitle').value='';document.getElementById('adLink').value='';document.getElementById('adViews').value=''; loadAds();
+}
+async function loadAds(){
+ let {data:ads, error} = await supa.from('ads').select('*').order('created_at',{ascending:false}).limit(50);
+ if(error){ document.getElementById('tasksList').innerHTML = 'Error: '+error.message; return; }
+ let tasks=document.getElementById('tasksList'); let available=ads.filter(a=>a.remaining>0 && a.owner!=user.id);
+ let html=''; if(available.length==0) html='<div style="text-align:center;color:#6b7280;padding:20px">No ads available now.<br>Be the first to post!</div>'; 
+ available.forEach(ad=>{html+=`<div class="card" style="display:flex;justify-content:space-between;align-items:center"><div><b>${ad.title}</b><br><small style="color:#9ca3af">${ad.remaining} left - by ${ad.owner_name}</small></div><button class="btn btn-prem" style="width:auto;padding:8px 14px" onclick="viewAd(${ad.id},'${ad.link.replace(/'/g,"")}')">View +1</button></div>`}); tasks.innerHTML=html;
+ let list=document.getElementById('adsList'); let html2=''; ads.forEach(ad=>{html2+=`<div class="card"><div style="display:flex;justify-content:space-between"><b>${ad.title}</b><span class="badge green">${ad.remaining}/${ad.total_views}</span></div><small style="color:#9ca3af;word-break:break-all">${ad.link}</small><br><small>by ${ad.owner_name}</small></div>`}); list.innerHTML=html2 || '<div style="text-align:center;color:#6b7280;padding:20px">No ads yet</div>';
+ local.global = ads.reduce((s,a)=>s+(a.total_views-a.remaining),0); saveLocal();
+}
+async function viewAd(id,link){
+ let {data:ad} = await supa.from('ads').select('*').eq('id',id).single(); 
+ if(!ad || ad.remaining<=0) return alert('This ad finished!');
+ await supa.from('ads').update({remaining: ad.remaining-1}).eq('id',id);
+ window.open(link,'_blank');
+ local.balance+=1; local.earned+=1; saveLocal(); setTimeout(()=>{ alert('+1 coin earned!'); loadAds(); },500);
+}
+function copyRef(){navigator.clipboard.writeText(document.getElementById('refLink').innerText); alert('Copied!');}
+loadAds(); setInterval(loadAds, 10000);
+</script>
+</body>
+</html>

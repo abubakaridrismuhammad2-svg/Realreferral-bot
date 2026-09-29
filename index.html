@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>RealReferral V2</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Inter,Arial}body{background:#0a0a0f;color:#fff;padding:16px;padding-bottom:110px}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}.av{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#8b5cf6,#f59e0b);display:flex;align-items:center;justify-content:center;font-weight:900}
+.bal{background:rgba(255,255,255,.08);padding:8px 14px;border-radius:12px;font-weight:800}
+.card{background:rgba(255,255,255,.06);border:1px solid rgba(139,92,246,.25);border-radius:20px;padding:16px;margin-bottom:12px;backdrop-filter:blur(10px)}
+.stats-row{display:flex;justify-content:space-around;text-align:center;gap:8px}
+.stats-row>div{flex:1;border-right:1px solid rgba(255,255,255,.1)} .stats-row>div:last-child{border:none}
+.num{font-size:22px;font-weight:900} .lbl{font-size:10px;color:#9ca3af;margin-top:4px}
+.weekly{background:linear-gradient(135deg,rgba(139,92,246,.15),rgba(59,130,246,.12));border:1px solid rgba(139,92,246,.4)}
+.days{display:flex;justify-content:space-between;margin:12px 0}.day{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;font-size:12px}.day.done{background:linear-gradient(135deg,#8b5cf6,#a78bfa);color:#fff}
+.btn{width:100%;padding:13px;border:none;border-radius:14px;font-weight:800;cursor:pointer}.btn-prem{background:linear-gradient(135deg,#8b5cf6,#ec4899);color:#fff}.btn-claim{background:linear-gradient(135deg,#a78bfa,#8b5cf6);color:#fff;box-shadow:0 0 20px rgba(139,92,246,.5)}
+.input{width:100%;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);color:#fff;margin-bottom:8px;outline:none}
+.page{display:none}.page.active{display:block}
+.nav{position:fixed;bottom:8px;left:8px;right:8px;background:rgba(18,18,22,.96);border:1px solid rgba(255,255,255,.1);border-radius:24px;display:flex;justify-content:space-around;padding:6px;z-index:100}
+.nav div{flex:1;text-align:center;opacity:.45;padding:6px;border-radius:14px;cursor:pointer}.nav div.active{opacity:1;background:rgba(255,255,255,.12)}
+.badge{font-size:10px;padding:4px 8px;border-radius:20px;background:rgba(34,197,94,.2);color:#4ade80;font-weight:800}
+</style></head><body>
+<div class="top"><div style="display:flex;gap:10px;align-items:center"><div class="av">R</div><div><small style="color:#9ca3af">Welcome</small><h3 id="uName">Abubakar</h3></div></div><div class="bal" id="balTop">💎 182</div></div>
+
+<div id="p-home" class="page active">
+<!-- SINGLE UNIFIED STATS - GUDa DAYA MAI AKWATI UKU A CIKI -->
+<div class="card" style="padding:14px 8px">
+<div class="stats-row">
+<div><div style="font-size:20px">👁️</div><div class="lbl">Total Views</div><div class="num" id="g">0</div></div>
+<div><div style="font-size:20px">💎</div><div class="lbl">Your Coins</div><div class="num" id="b">182</div><div style="font-size:10px;color:#4ade80" id="todayBonus"></div></div>
+<div><div style="font-size:20px">📈</div><div class="lbl">Earned</div><div class="num" id="r">0</div></div>
+</div>
+</div>
+
+<!-- WEEKLY CHECK-IN 22 COINS -->
+<div class="card weekly">
+<div style="display:flex;justify-content:space-between;align-items:center"><h4>📅 Weekly Check-in</h4><span class="badge" id="streakBadge">Day 1 of 7</span></div>
+<p style="font-size:11px;color:#9ca3af;margin:6px 0">Claim 22 coins daily. Miss a day, lose streak!</p>
+<div class="days" id="daysRow"></div>
+<button class="btn btn-claim" id="claimBtn" onclick="claimWeekly()">✨ Claim 22 Coins</button>
+<p style="font-size:10px;color:#6b7280;text-align:center;margin-top:6px" id="claimInfo">Claim every 24h</p>
+</div>
+
+<!-- CREATE AD - YANZU A HOME, WURI MAFI DACEWA -->
+<div class="card" style="border:1px solid rgba(245,158,11,.3)">
+<h4>🚀 Promote Your Link</h4><p style="font-size:11px;color:#9ca3af;margin:4px 0 10px">1 Coin = 1 View - Global</p>
+<input id="adTitle" class="input" placeholder="Title: e.g. Join My Channel">
+<input id="adLink" class="input" placeholder="https://t.me/...">
+<input id="adViews" class="input" type="number" placeholder="Views needed (e.g. 50)" oninput="document.getElementById('cost').innerText=this.value||0">
+<div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:10px"><span>Cost: <b id="cost" style="color:#f59e0b">0</b> coins</span><span>Bal: <b id="have">182</b></span></div>
+<button class="btn btn-prem" onclick="createAd()">Pay & Publish - 1 Coin = 1 View</button>
+</div>
+</div>
+
+<div id="p-tasks" class="page"><h3>⚡ Earn Coins</h3><p style="font-size:11px;color:#9ca3af;margin:6px 0 12px">View ads = 1 coin each</p><div id="tasksList">Loading...</div></div>
+<div id="p-posts" class="page"><h3>📢 Marketplace</h3><div id="adsList" style="margin-top:12px"></div></div>
+<div id="p-top" class="page"><h3>🏆 Leaderboard</h3><div class="card">Global from Supabase</div></div>
+<div id="p-refs" class="page"><div class="card" style="background:linear-gradient(135deg,#8b5cf6,#3b82f6);text-align:center"><h3>Invite & Earn 10</h3><div id="refLink" style="background:rgba(0,0,0,.35);padding:10px;border-radius:10px;margin:10px 0;font-size:11px;word-break:break-all"></div><button class="btn" style="background:#fff;color:#000" onclick="copyRef()">Copy Link</button></div></div>
+
+<div class="nav">
+<div class="active" onclick="showPage('home',0)"><div>🏠</div><small>Home</small></div>
+<div onclick="showPage('tasks',1)"><div>⚡</div><small>Tasks</small></div>
+<div onclick="showPage('posts',2)"><div>📢</div><small>Posts</small></div>
+<div onclick="showPage('top',3)"><div>🏆</div><small>Top</small></div>
+<div onclick="showPage('refs',4)"><div>👥</div><small>Refs</small></div>
+</div>
+
+<script>
+const SUPABASE_URL="https://hgdxkzzgzmiropkrdfhm.supabase.co";const SUPABASE_KEY="sb_publishable_8jJGMNp-44jHaeJfe2MwNw_yv9x100O";
+const supa=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const tg=window.Telegram?Telegram.WebApp:null; if(tg){tg.ready();tg.expand();}
+const user=tg?.initDataUnsafe?.user||{id:12345,first_name:"Abubakar"};
+document.getElementById('uName').innerText=user.first_name;
+document.getElementById('refLink').innerText=`https://t.me/realreferralAdsbot?start=${user.id}`;
+let local=JSON.parse(localStorage.getItem('rr_v2')||'{"balance":182,"earned":0,"global":0,"streak":0,"lastClaim":0,"claimedDays":[]}');
+function save(){localStorage.setItem('rr_v2',JSON.stringify(local));ui();}
+function ui(){
+ document.getElementById('b').innerText=local.balance;document.getElementById('balTop').innerText='💎 '+local.balance;document.getElementById('have').innerText=local.balance;document.getElementById('g').innerText=local.global;document.getElementById('r').innerText=local.earned;document.getElementById('cost').innerText=document.getElementById('adViews').value||0;
+ renderWeekly();
+}
+function renderWeekly(){
+ let row=document.getElementById('daysRow'); row.innerHTML=''; const days=['Mo','Tu','We','Th','Fr','Sa','Su'];
+ days.forEach((d,i)=>{let done=local.claimedDays.includes(i); row.innerHTML+=`<div style="text-align:center"><div class="day ${done?'done':''}">${done?'✓':d[0]}</div><small style="font-size:9px;color:#6b7280">${d}</small></div>`});
+ document.getElementById('streakBadge').innerText=`Day ${local.streak||1} of 7`;
+ let canClaim=Date.now()-local.lastClaim > 24*60*60*1000;
+ document.getElementById('claimBtn').disabled=!canClaim; document.getElementById('claimBtn').innerText=canClaim?'✨ Claim 22 Coins':'⏳ Come tomorrow';
+ document.getElementById('claimInfo').innerText=canClaim?'Ready to claim!':'Next claim in '+Math.ceil((24*60*60*1000-(Date.now()-local.lastClaim))/3600000)+'h';
+}
+function claimWeekly(){
+ if(Date.now()-local.lastClaim < 24*60*60*1000) return alert('Come back tomorrow!');
+ let daysSinceLast=(Date.now()-local.lastClaim)/(24*60*60*1000);
+ if(daysSinceLast>2 && local.lastClaim!=0){ local.streak=0; local.claimedDays=[]; alert('Streak lost! You missed a day. Restarting...');}
+ local.balance+=22; local.streak=(local.streak||0)+1; if(local.streak>7) local.streak=1;
+ local.lastClaim=Date.now(); if(!local.claimedDays.includes((local.streak-1)%7)) local.claimedDays.push((local.streak-1)%7);
+ document.getElementById('todayBonus').innerText='+22 today'; save(); alert('✅ 22 Coins claimed! Streak: '+local.streak+'/7');
+}
+function showPage(p,i){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));document.getElementById('p-'+p).classList.add('active');document.querySelectorAll('.nav div').forEach((x,idx)=>x.classList.toggle('active',idx===i)); if(p!=='home') loadAds();}
+async function createAd(){let t=document.getElementById('adTitle').value.trim();let l=document.getElementById('adLink').value.trim();let v=parseInt(document.getElementById('adViews').value); if(!t||!l||!v) return alert('Fill all'); if(local.balance<v) return alert('Need '+v+' coins'); if(!l.startsWith('http')) return alert('Link must be https://'); local.balance-=v;save(); let {error}=await supa.from('ads').insert([{title:t,link:l,total_views:v,remaining:v,owner:user.id,owner_name:user.first_name}]); if(error){alert(error.message);local.balance+=v;save();return;} alert('Published! Global!');document.getElementById('adTitle').value='';document.getElementById('adLink').value='';document.getElementById('adViews').value='';loadAds();}
+async function loadAds(){let {data:ads}=await supa.from('ads').select('*').order('created_at',{ascending:false}).limit(50); if(!ads) return; let avail=ads.filter(a=>a.remaining>0&&a.owner!=user.id); document.getElementById('tasksList').innerHTML=avail.length?avail.map(a=>`<div class="card" style="display:flex;justify-content:space-between;align-items:center"><div><b>${a.title}</b><br><small style="color:#9ca3af">${a.remaining} left</small></div><button class="btn btn-prem" style="width:auto;padding:8px 14px" onclick="viewAd(${a.id},'${a.link.replace(/'/g,'')}')">View +1</button></div>`).join(''):'<div style="text-align:center;color:#666;padding:20px">No ads</div>'; document.getElementById('adsList').innerHTML=ads.map(a=>`<div class="card"><div style="display:flex;justify-content:space-between"><b>${a.title}</b><span class="badge">${a.remaining}/${a.total_views}</span></div><small style="color:#9ca3af">${a.link}</small></div>`).join(''); local.global=ads.reduce((s,a)=>s+(a.total_views-a.remaining),0);save();}
+async function viewAd(id,link){let {data:ad}=await supa.from('ads').select('*').eq('id',id).single(); if(!ad||ad.remaining<=0) return alert('Finished'); await supa.from('ads').update({remaining:ad.remaining-1}).eq('id',id); window.open(link,'_blank'); local.balance+=1;local.earned+=1;save(); setTimeout(()=>{alert('+1');loadAds();},500);}
+function copyRef(){navigator.clipboard.writeText(document.getElementById('refLink').innerText);alert('Copied');}
+ui();loadAds();setInterval(loadAds,10000);
+</script></body></html>

@@ -20,7 +20,8 @@
 try{
 const SUPABASE_URL="https://hgdxkzzgzmiropkrdfhm.supabase.co";const SUPABASE_KEY="sb_publishable_8jJGMNp-44jHaeJfe2MwNw_yv9x100O";const supa=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 const tg=window.Telegram?Telegram.WebApp:null; if(tg){tg.ready();tg.expand();}
-let user={id:12345,first_name:"User"}; try{if(tg&&tg.initDataUnsafe&&tg.initDataUnsafe.user)user=tg.initDataUnsafe.user;}catch(e){}
+let user={id:7741288581,first_name:"User"}; try{if(tg&&tg.initDataUnsafe&&tg.initDataUnsafe.user)user=tg.initDataUnsafe.user;}catch(e){}
+let myId = user.id;try{if(tg&&tg.initDataUnsafe&&tg.initDataUnsafe.user)user=tg.initDataUnsafe.user;}catch(e){}
 const BOT_LINK="https://t.me/realreferralAdsbot?start="+user.id;
 let localData={balance:282,earned:0,global:0,joined:[],refs:0,refCoins:0,groupCoins:0,premium:null,premiumExpiry:null,todayEarn:0};
 try{let s=localStorage.getItem('rr_v15_en'); if(s){localData={...localData,...JSON.parse(s)};}}catch(e){}

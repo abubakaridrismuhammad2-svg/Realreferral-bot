@@ -23,7 +23,58 @@ const tg=window.Telegram?Telegram.WebApp:null; if(tg){tg.ready();tg.expand();}
 let user={id:7741288581,first_name:"User"}; try{if(tg&&tg.initDataUnsafe&&tg.initDataUnsafe.user)user=tg.initDataUnsafe.user;}catch(e){}
 let myId = user.id;try{if(tg&&tg.initDataUnsafe&&tg.initDataUnsafe.user)user=tg.initDataUnsafe.user;}catch(e){}
 const BOT_LINK="https://t.me/realreferralAdsbot?start="+user.id;
-let localData={balance:282,earned:0,global:0,joined:[],refs:0,refCoins:0,groupCoins:0,premium:null,premiumExpiry:null,todayEarn:0};
+let localData={balance:282,earned:0,global:0,joined:[],refs:0,refCoins:0,groupCoins:0,premium:null,premiumExpiry:null,todayEarn:0};// ===== SUPABASE USER SYSTEM V15.2 =====
+async function initUser(){
+  try{
+    let {data} = await supa.from('users').select('*').eq('id', myId).single();
+    if(!data){
+      await supa.from('users').insert([{id:myId, username:user.first_name||'User', balance:localData.balance||0, invited_count:0, earned_from_refs:0}]);
+    } else {
+      if(data.balance>localData.balance){ localData.balance=data.balance; }
+      localData.refs=data.invited_count||0;
+      localData.refCoins=data.earned_from_refs||0;
+      if(localData.balance>data.balance){
+        await supa.from('users').update({balance:localData.balance}).eq('id', myId);
+      }
+    }
+  }catch(e){console.log('initUser',e)}
+}
+async function handleReferral(){
+  try{
+    const p = new URLSearchParams(window.location.search);
+    const refId = p.get('start') || p.get('startapp');
+    if(!refId) return;
+    if(String(refId)==String(myId)) return;
+    if(localStorage.getItem('ref_done_'+refId)) return;
+    let {data:me} = await supa.from('users').select('referred_by').eq('id', myId).single();
+    if(me && me.referred_by) return;
+    await supa.from('users').update({referred_by: parseInt(refId)}).eq('id', myId);
+    let {data:r} = await supa.from('users').select('balance,invited_count,earned_from_refs').eq('id', parseInt(refId)).single();
+    if(r){
+      await supa.from('users').update({
+        balance:(r.balance||0)+10,
+        invited_count:(r.invited_count||0)+1,
+        earned_from_refs:(r.earned_from_refs||0)+10
+      }).eq('id', parseInt(refId));
+      await supa.from('referrals').insert([{referrer_id: parseInt(refId), referred_id: myId, reward:10}]);
+      localStorage.setItem('ref_done_'+refId,'1');
+    }
+  }catch(e){console.log('ref err',e)}
+}
+async function loadReferralsFromDB(){
+  try{
+    let {data} = await supa.from('users').select('invited_count,earned_from_refs,balance').eq('id', myId).single();
+    if(data){
+      localData.refs=data.invited_count||0;
+      localData.refCoins=data.earned_from_refs||0;
+      localData.balance=data.balance||localData.balance;
+      ui();
+    }
+  }catch(e){}
+}
+async function syncBalanceToDB(){
+  try{ await supa.from('users').update({balance:localData.balance}).eq('id', myId); }catch(e){}
+}
 try{let s=localStorage.getItem('rr_v15_en'); if(s){localData={...localData,...JSON.parse(s)};}}catch(e){}
 const monetizationLinks=["https://www.profitableratecpmnetwork.com/rg9frw0b?key=3a285a0baa1bd805086b878c9945749a","https://www.profitableratecpmnetwork.com/jipcgnfd?key=79a72cee205f810d60114be4f4761dd1","https://www.profitableratecpmnetwork.com/bmdtadg5pg?key=66bda5e5e2e88b4c29fffd6cc217a6ae","https://www.profitableratecpmnetwork.com/kxibh57f73?key=af241f4ce58f6d75267ae7f41fe07ae2","https://omg10.com/4/11920289","https://omg10.com/4/11920288","https://omg10.com/4/11920287","https://omg10.com/4/10943082"];
 let rotatorIndex=parseInt(localStorage.getItem('rotatorIdx')||'0');

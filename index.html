@@ -95,14 +95,9 @@ window.finishView=async function(){if(!pendingAd)return;if(pendingAd.isReal&&pen
 window.pasteLink=async function(){try{let t=await navigator.clipboard.readText();document.getElementById('qLink').value=t;}catch(e){}}
 document.getElementById('qViews').addEventListener('input',ui);
 window.quickAdd=async function(){let title=document.getElementById('qTitle').value.trim();let link=document.getElementById('qLink').value.trim();let views=parseInt(document.getElementById('qViews').value)||0;if(!title||!link||!views)return alert('Cika Title, Link, Views');if(!link.startsWith('http'))return alert('Link must start with https://');if(localData.balance<views)return alert('Balance not enough! Have '+localData.balance);localData.balance-=views;save();try{let {error}=await supa.from('ads').insert([{title:title,link:link,total_views:views,remaining:views,owner:myId,owner_name:user.first_name}]);if(error)throw error;document.getElementById('qTitle').value='';document.getElementById('qLink').value='';alert('✅ Task Added!');loadAds();}catch(e){alert(e.message);localData.balance+=views;save();}}
-<div id="p-refs" class="page"><div class="top-bar"><h1>REFS</h1></div>
-<div class="card" style="text-align:center">
-<p style="font-weight:900">🎁 Invite & Earn 10%</p>
-<div id="refLink" style="background:#111;color:#fff;padding:12px;border-radius:12px;word-break:break-all;font-size:11px;margin:12px 0"></div>
-<div style="display:flex;gap:10px">
-<button class="btn" style="background:#FFD93D" onclick="copyRef()">📋 COPY</button>
-<button class="btn" style="background:#22c55e;color:#fff" onclick="shareRef()">↗ SHARE</button>
-</div>
-<div style="margin-top:12px;font-size:11px;opacity:.6" id="refCount">0 Referrals</div>
-</div></div>
+  
+let refEl=document.getElementById('refLink');if(refEl)refEl.innerText="https://t.me/realreferralAdsbot?start="+myId;
+window.copyRef=function(){navigator.clipboard.writeText(refEl.innerText);alert('✅ Copied!');}
+window.shareRef=function(){if(navigator.share){navigator.share({title:'Join RealReferral',text:'Earn with me!',url:refEl.innerText});}else{navigator.clipboard.writeText(refEl.innerText);alert('✅ Link Copied - Share am!');}}
+ui();renderGroups();loadAds();
 </script></body></html>

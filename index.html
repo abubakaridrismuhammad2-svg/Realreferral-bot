@@ -60,7 +60,15 @@
 <div id="p-tasks" class="page"><div class="top-bar"><h1>TASKS</h1></div><div id="tasksList"></div></div>
 <div id="p-posts" class="page"><div class="top-bar"><h1>PREMIUM</h1></div><div class="card" style="text-align:center"><h3>Premium Coming Soon</h3></div></div>
 <div id="p-top" class="page"><div class="top-bar"><h1>GROUPS</h1></div><div id="groupsPage"></div></div>
-<div id="p-refs" class="page"><div class="top-bar"><h1>REFS</h1></div><div class="card"><div id="refLink" style="background:#111;color:#fff;padding:10px;border-radius:12px;word-break:break-all;font-size:11px"></div></div></div>
+<div class="card" style="text-align:center">
+<p style="font-weight:900">🎁 Invite & Earn 10%</p>
+<div id="refLink" style="background:#111;color:#fff;padding:12px;border-radius:12px;word-break:break-all;font-size:11px;margin:12px 0"></div>
+<div style="display:flex;gap:10px">
+<button class="btn" style="background:#FFD93D" onclick="copyRef()">📋 COPY</button>
+<button class="btn" style="background:#22c55e;color:#fff" onclick="shareRef()">↗ SHARE</button>
+</div>
+<div style="margin-top:12px;font-size:11px;opacity:.6" id="refCount">0 Referrals</div>
+</div></div>
 
 <div class="nav"><div class="active" onclick="showPage('home',0)"><div>🏠</div><small>Home</small></div><div onclick="showPage('tasks',1)"><div>⚡</div><small>Tasks</small></div><div onclick="showPage('posts',2)"><div>💎</div><small>Premium</small></div><div onclick="showPage('top',3)"><div>👥</div><small>Groups</small></div><div onclick="showPage('refs',4)"><div>👤</div><small>Refs</small></div></div>
 

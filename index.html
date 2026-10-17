@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>EARN TASK - FINAL READY KEEP ALL</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:Inter,Arial,sans-serif}
+body{background:#f4f5f7;color:#111;line-height:1.4;padding-bottom:90px}
+.header{position:sticky;top:0;z-index:99;background:#111;color:#fff;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;font-weight:900;border-bottom:4px solid #FFD93D}
+.card{background:#fff;border:3px solid #111;border-radius:18px;padding:14px;margin:10px;box-shadow:6px 6px 0 #111}
+.btn{border:3px solid #111;border-radius:12px;padding:12px 14px;font-weight:900;cursor:pointer;text-decoration:none;display:inline-block;text-align:center;box-shadow:4px 4px 0 #111}
+.btn:active{transform:translate(2px,2px);box-shadow:2px 2px 0 #111 !important}
+.task-card{border:3px solid #111;border-radius:14px;padding:12px;margin:8px 0;background:#fff;box-shadow:4px 4px 0 #111}
+.badge{background:#FFD93D;border:2px solid #111;border-radius:20px;padding:4px 12px;font-size:11px;font-weight:900}
+.ad-slot{border:3px dashed #111;border-radius:14px;padding:10px;margin:10px;text-align:center;background:#FFFBEB;min-height:70px;font-weight:800}
+.nav{display:flex;gap:8px;margin:10px;position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:3px solid #111;padding:8px;z-index:100}
+.nav button{flex:1}
+input{width:100%;padding:12px;margin:6px 0;border:3px solid #111;border-radius:12px;font-weight:700}
+.dashed{border:3px dashed #111;border-radius:14px;padding:20px;text-align:center;background:#fff}
+</style>
+</head>
+<body>
+<div class="header"><span>EARN TASK - ENGLISH</span><span id="timerBadge" class="badge" style="background:#fff">READY</span></div>
+<div style="padding-bottom:70px">
+<div class="card"><b>🔥 Daily Earn Links - 8 Links Rotator</b><div style="display:grid;gap:8px;margin-top:10px" id="monetGrid"></div></div>
+<div class="ad-slot">Adsterra 320x50 - Your code active</div>
+<div class="ad-slot">Adsterra 300x250 - Your code active</div>
+<div class="ad-slot">Adsterra 728x90 - Your code active</div>
+<div id="tab-tasks">
+<div class="card"><div style="display:flex;justify-content:space-between"><b>CURRENT TASK</b><span id="currentBadge" class="badge">0 AVAILABLE</span></div><div id="currentTaskWrap" style="margin-top:10px"><div class="dashed"><p style="font-weight:800">No tasks available</p><small>Earn free tasks by completing others</small></div></div></div>
+<div class="card"><div style="display:flex;justify-content:space-between"><b>MY TASKS</b><span id="taskCountBadge" class="badge">0/3 USED</span></div><div id="myTasksWrap" style="margin-top:10px"><div class="dashed"><p style="font-weight:900;font-size:16px">No active tasks</p><p style="margin:8px 0">Create your first task below - you can place ads here!</p><button class="btn" style="background:#111;color:#fff;width:100%;margin-top:8px" onclick="document.getElementById('quickCard').scrollIntoView({behavior:'smooth'})">+ ADD YOUR FIRST TASK</button></div></div></div>
+<div class="card" id="quickCard"><b>Quick Post - English Version</b><input id="qTitle" placeholder="Title - What are you promoting?"><input id="qUrl" placeholder="https://your-link.com"><input id="qViews" type="number" value="50"><button class="btn" style="background:#FFD93D;width:100%;margin-top:6px" onclick="quickAdd()">+ ADD TASK</button><div id="qMsg" style="margin-top:8px;font-size:12px;font-weight:900;text-align:center"></div></div>
+</div>
+<div id="tab-premium" style="display:none"><div class="card"><b>Premium Tasks</b><p>Premium area - Full monetization included</p><div id="premiumList"></div></div></div>
+<div id="tab-refs" style="display:none"><div class="card"><b>Referrals - Invite & Earn</b><code id="refLink" style="display:block;background:#f4f4f4;padding:10px;border:2px solid #111;border-radius:10px;margin-top:8px;word-break:break-all"></code><button class="btn" style="background:#111;color:#fff;width:100%;margin-top:8px" onclick="copyRef()">Copy Link</button></div></div>
+</div>
+<div class="nav"><button class="btn" style="background:#FFD93D" onclick="showTab('tasks')">Tasks</button><button class="btn" style="background:#fff" onclick="showTab('premium')">Premium</button><button class="btn" style="background:#fff" onclick="showTab('refs')">Refs</button></div>
+<script>
+const SUPABASE_URL="https://hgdxkzzgzmiropkrdfhm.supabase.co";
+const SUPABASE_KEY="sb_publishable_8jJGMNp-44jHaeJfe2MwNw_yv9x100O";
+const supa = supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const monetizationLinks=["https://www.profitableratecpmnetwork.com/rg9frw0b?key=3a285a0baa1bd805086b878c9945749a","https://www.profitableratecpmnetwork.com/jipcgnfd?key=79a72cee205f810d60114be4f4761dd1","https://www.profitableratecpmnetwork.com/bmdtadg5pg?key=66bda5e5e2e88b4c29fffd6cc217a6ae","https://www.profitableratecpmnetwork.com/kxibh57f73?key=af241f4ce58f6d75267ae7f41fe07ae2","https://omg10.com/4/11920289","https://omg10.com/4/11920288","https://omg10.com/4/11920287","https://omg10.com/4/10943082"];
+let rotatorIndex=parseInt(localStorage.getItem('rotatorIdx')||'0');
+function getNextLink(){let l=monetizationLinks[rotatorIndex%monetizationLinks.length];rotatorIndex++;localStorage.setItem('rotatorIdx',rotatorIndex);return l;}
+document.getElementById('monetGrid').innerHTML=monetizationLinks.map((l,i)=>`<a href="${l}" target="_blank" class="btn" style="background:${['#00FF88','#00D4FF','#FF6B6B','#9D4EDD','#FFD93D','#00FF88','#FF6B6B','#00D4FF'][i]};color:#111">Link ${i+1} - Earn +1</a>`).join('');
+let myId = localStorage.getItem('myId') || ('user_'+Math.random().toString(36).slice(2,10));
+localStorage.setItem('myId',myId);
+document.getElementById('refLink').innerText = location.href.split('?')[0] + '?ref=' + myId;
+let ads=[]; let cooldownUntil=0;
+function showTab(t){document.getElementById('tab-tasks').style.display=t==='tasks'?'block':'none';document.getElementById('tab-premium').style.display=t==='premium'?'block':'none';document.getElementById('tab-refs').style.display=t==='refs'?'block':'none';}
+async function loadTasks(){try{let {data}=await supa.from('ads').select('*').eq('status','active').order('id',{ascending:false});ads=data||[];}catch(e){ads=[];}renderAll();}
+function renderAll(){let others=ads.filter(a=>String(a.owner)!==String(myId)&&a.remaining>0);let cw=document.getElementById('currentTaskWrap');let cb=document.getElementById('currentBadge');if(others.length>0){let a=others[0];let can=Date.now()>cooldownUntil;cw.innerHTML=`<div class="task-card"><b>${a.title}</b><br><small>${a.remaining} clicks left</small><br><button class="btn" style="background:#111;color:#fff;width:100%;margin-top:10px" ${can?'':'disabled'} onclick="doTask(${a.id},'${a.url||a.link}')">${can?'JOIN & EARN +1 CLICK':'WAIT COOLDOWN'}</button></div>`;cb.innerText=others.length+' AVAILABLE';cb.style.background='#00FF88';}else{cw.innerHTML=`<div class="dashed"><p style="font-weight:800">No tasks available</p><small>Use Quick Post below to create - you can place ads here!</small></div>`;cb.innerText='0 AVAILABLE';cb.style.background='#FFD93D';}let myW=document.getElementById('myTasksWrap');let my=ads.filter(a=>String(a.owner)===String(myId));if(my.length>0){myW.innerHTML=my.map(a=>`<div class="task-card"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><div style="flex:1"><b>${a.title}</b><br><small>${a.remaining}/${a.total_views} left - Received ${a.total_views-a.remaining}</small></div><button onclick="deleteTask(${a.id})" style="background:#ff4444;color:#fff;border:3px solid #111;border-radius:10px;padding:8px 12px;font-weight:900">🗑️</button></div></div>`).join('')+`<button class="btn" style="background:#FFD93D;width:100%;margin-top:10px" onclick="document.getElementById('quickCard').scrollIntoView({behavior:'smooth'})">+ ADD MORE TASK (${my.length}/3 USED) - Place more ads here</button>`;document.getElementById('taskCountBadge').innerText=my.length+'/3 USED';}else{myW.innerHTML=`<div class="dashed"><p style="font-weight:900;font-size:16px">No active tasks</p><p style="margin:8px 0">Create your first task below - you can place ads here!</p><button class="btn" style="background:#111;color:#fff;width:100%;margin-top:8px" onclick="document.getElementById('quickCard').scrollIntoView({behavior:'smooth'})">+ ADD YOUR FIRST TASK</button></div>`;document.getElementById('taskCountBadge').innerText='0/3 USED';}}async function quickAdd(){let t=document.getElementById('qTitle').value.trim();let u=document.getElementById('qUrl').value.trim();let v=parseInt(document.getElementById('qViews').value)||50;let m=document.getElementById('qMsg');if(!t||!u){m.innerText='Please fill Title and Link';return;}if(!u.startsWith('http'))u='https://'+u;let {error}=await supa.from('ads').insert([{title:t,url:u,link:u,total_views:v,remaining:v,owner:myId,status:'active'}]);if(error){m.innerText='Error: '+error.message;return;}m.innerText='Task Added Successfully! You placed ad in MY TASKS! ✅';document.getElementById('qTitle').value='';document.getElementById('qUrl').value='';loadTasks();}
+async function doTask(id,url){let monLink=getNextLink();window.open(monLink,'_blank');setTimeout(()=>window.open(url,'_blank'),500);cooldownUntil=Date.now()+2*60*1000;let a=ads.find(x=>x.id===id);if(a&&a.remaining>0)await supa.from('ads').update({remaining:a.remaining-1}).eq('id',id);startTimer();setTimeout(loadTasks,1500);}
+async function deleteTask(id){if(!confirm('Delete?'))return;await supa.from('ads').delete().eq('id',id);loadTasks();}
+function startTimer(){let iv=setInterval(()=>{let diff=cooldownUntil-Date.now();let b=document.getElementById('timerBadge');if(diff<=0){b.innerText='READY';b.style.background='#00FF88';clearInterval(iv);}else{b.innerText='WAIT '+Math.floor(diff/1000)+'s';b.style.background='#FFD93D';}},500);}
+function copyRef(){navigator.clipboard.writeText(document.getElementById('refLink').innerText);alert('Copied!');}
+loadTasks();setInterval(loadTasks,20000);
+</script>
+</body>
+</html>

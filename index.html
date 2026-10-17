@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Earn Task - English</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#f5f5f5}
+.header{background:#111;color:#fff;padding:12px;text-align:center;font-weight:800}
+.card{background:#fff;border:3px solid #111;border-radius:14px;padding:12px;margin:10px;box-shadow:4px 4px 0 #111}
+.btn{border:3px solid #111;border-radius:10px;padding:10px 14px;font-weight:800;cursor:pointer}
+.task-card{border:2px solid #111;border-radius:10px;padding:10px;margin:8px 0;background:#fff}
+.badge{background:#FFD93D;border:2px solid #111;border-radius:20px;padding:2px 8px;font-size:12px;font-weight:800}
+</style>
+</head>
+<body>
+<div class="header">EARN TASK - ENGLISH VERSION</div>
+
+<div class="card">
+<div style="display:flex;justify-content:space-between"><b>CURRENT TASK</b><span id="currentBadge" class="badge">Loading...</span></div>
+<div id="currentTaskWrap" style="margin-top:8px">Loading tasks...</div>
+</div>
+
+<div class="card">
+<div style="display:flex;justify-content:space-between"><b>MY TASKS</b><span id="taskCountBadge" class="badge">0/3 USED</span></div>
+<div id="myTasksWrap" style="margin-top:8px">Loading...</div>
+</div>
+
+<div class="card" id="quickCard">
+<b>Quick Post</b>
+<input id="qTitle" placeholder="Title" style="width:100%;padding:8px;margin:6px 0;border:2px solid #111;border-radius:8px">
+<input id="qUrl" placeholder="https://your-link.com" style="width:100%;padding:8px;margin:6px 0;border:2px solid #111;border-radius:8px">
+<input id="qViews" type="number" value="50" style="width:100%;padding:8px;margin:6px 0;border:2px solid #111;border-radius:8px">
+<button class="btn" style="background:#FFD93D;width:100%" onclick="quickAdd()">+ ADD TASK</button>
+<div id="qMsg" style="margin-top:6px;font-size:12px"></div>
+</div>
+
+<script>
+const SUPA_URL='https://YOUR_SUPABASE_URL.supabase.co';
+const SUPA_KEY='YOUR_SUPABASE_ANON_KEY';
+const supa = window.supabase ? window.supabase.createClient(SUPA_URL, SUPA_KEY) : null;
+let myId = localStorage.getItem('myId') || ('user_'+Math.random().toString(36).slice(2));
+localStorage.setItem('myId', myId);
+let ads=[];
+
+async function loadTasks(){
+ let {data} = await supa.from('ads').select('*').eq('status','active').order('id',{ascending:false});
+ ads = data||[];
+ renderCurrentTask();
+}
+function renderCurrentTask(){
+ // CURRENT TASK - show one random not owned by me
+ let others = ads.filter(a=>String(a.owner)!==String(myId) && a.remaining>0);
+ let cw = document.getElementById('currentTaskWrap');
+ if(others.length>0){
+   let a = others[0];
+   cw.innerHTML=`<div class="task-card"><b>${a.title}</b><br><small>${a.remaining} clicks left</small><br><button class="btn" style="background:#111;color:#fff;margin-top:6px;width:100%" onclick="doTask(${a.id},'${a.url}')">JOIN & EARN +1 CLICK</button></div>`;
+   document.getElementById('currentBadge').innerText=others.length+' AVAILABLE';
+ }else{
+   cw.innerHTML=`<div class="task-card" style="text-align:center;border-style:dashed"><p>No tasks available</p><small>Earn free tasks by completing others</small></div>`;
+   document.getElementById('currentBadge').innerText='0 AVAILABLE';
+ }
+ // MY TASKS - FIXED ENGLISH WITH ADD BUTTON
+ let myW=document.getElementById('myTasksWrap');
+ let my=ads.filter(a=>String(a.owner)===String(myId));
+ if(my.length>0){
+   myW.innerHTML=my.map(a=>`<div class="task-card"><div style="display:flex;justify-content:space-between;align-items:center"><div><b>${a.title}</b><br><small>${a.remaining}/${a.total_views} left - Received ${a.total_views-a.remaining}</small></div><button onclick="deleteTask(${a.id})" style="background:#ff4444;color:#fff;border:2px solid #111;border-radius:8px;padding:6px 10px">🗑️</button></div></div>`).join('')+`<button class="btn" style="background:#FFD93D;margin-top:8px;width:100%" onclick="document.getElementById('quickCard').scrollIntoView({behavior:'smooth'})">+ ADD MORE TASK (${my.length}/3 USED)</button>`;
+   document.getElementById('taskCountBadge').innerText=my.length+'/3 USED';
+ }else{
+   myW.innerHTML=`<div class="task-card" style="border-style:dashed;text-align:center"><p style="font-weight:800">No active tasks</p><small>Create your first task below</small><br><button class="btn" style="background:#111;color:#fff;margin-top:10px;width:100%" onclick="document.getElementById('quickCard').scrollIntoView({behavior:'smooth'})">+ ADD YOUR FIRST TASK</button></div>`;
+   document.getElementById('taskCountBadge').innerText='0/3 USED';
+ }
+}
+async function quickAdd(){
+ let t=document.getElementById('qTitle').value.trim();
+ let u=document.getElementById('qUrl').value.trim();
+ let v=parseInt(document.getElementById('qViews').value)||50;
+ if(!t||!u) return document.getElementById('qMsg').innerText='Please fill Title and Link';
+ if(!u.startsWith('http')) u='https://'+u;
+ let {error} = await supa.from('ads').insert([{title:t,url:u,total_views:v,remaining:v,owner:myId,status:'active'}]);
+ if(error){ document.getElementById('qMsg').innerText='Error: '+error.message; return; }
+ document.getElementById('qMsg').innerText='Task Added Successfully!';
+ document.getElementById('qTitle').value=''; document.getElementById('qUrl').value='';
+ loadTasks();
+}
+async function doTask(id,url){
+ window.open(url,'_blank');
+ await supa.from('ads').update({remaining: supa.rpc ? undefined : null}).eq('id',id);
+ let a=ads.find(x=>x.id===id);
+ if(a && a.remaining>0){
+   await supa.from('ads').update({remaining:a.remaining-1}).eq('id',id);
+ }
+ setTimeout(loadTasks,1500);
+}
+async function deleteTask(id){
+ if(!confirm('Delete this task?')) return;
+ await supa.from('ads').delete().eq('id',id);
+ loadTasks();
+}
+loadTasks();
+</script>
+</body>
+</html>

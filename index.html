@@ -1,4 +1,4 @@
-<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>V16 ULTIMATE - FINAL WITH 728x90</title>
+ko<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>V16 ULTIMATE - FINAL WITH 728x90</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://pl31630942.profitableratecpmnetwork.com/73/de/fd/73defd015247e85e22bd208ec3f5a059.js"></script>
@@ -59,7 +59,27 @@ function renderCurrentTask(){let w=document.getElementById('currentTaskWrap');le
 function renderGroups(){let gs=[{id:'ads1',name:'Main Group',color:'g1',link:'https://t.me/+Rwe4riOGKPszMTI0'},{id:'community',name:'Community',color:'g2',link:'https://t.me/+Eyd0Z_uqQGM5ZjI0'},{id:'ads2',name:'VIP Group',color:'g3',link:'https://t.me/+OFwjUl2v-L44OTRk'}];let h=document.getElementById('joinHome');h.innerHTML=gs.map(g=>{let d=localData.joined.includes(g.id);return `<div class="group-card-new ${g.color}" onclick="joinGroup('${g.id}','${g.link}')"><div class="g-icon">RE</div><div style="flex:1"><b>${g.name}</b><br><small>${d?'✅ Joined':'+5 Coins'}</small></div><button class="${d?'btn-done':'btn-join'}">${d?'✅ Done':'+5'}</button></div>`}).join('');let gp=document.getElementById('groupsPage');if(gp)gp.innerHTML=h.innerHTML;}
 window.joinGroup=function(id,link){if(localData.joined.includes(id))return;window.open(link,'_blank');setTimeout(()=>{if(!localData.joined.includes(id)){localData.joined.push(id);localData.balance+=5;save();}},800);}
 window.showPage=function(p,i){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));document.getElementById('p-'+p).classList.add('active');document.querySelectorAll('.nav > div').forEach((x,idx)=>x.classList.toggle('active',idx===i));if(p=='tasks'||p=='home'||p=='refs')loadAds();if(p=='refs')loadRefCount();}
-window.loadAds=async function(){let {data:ads}=await supa.from('ads').select('*').order('created_at',{ascending:false}).limit(80);window.lastAdsList=ads||[];let myAds=ads.filter(a=>String(a.owner)===String(myId));localData.earned=myAds.reduce((s,a)=>s+((a.total_views||0)-(a.remaining||0)),0);localData.global=ads.reduce((s,a)=>s+((a.total_views||0)-(a.remaining||0)),0);save();renderCurrentTask();let listEl=document.getElementById('tasksList');let av=ads.filter(a=>a.remaining>0&&String(a.owner)!==String(myId));if(listEl){if(av.length>0){listEl.innerHTML=av.map(a=>{let can=canViewAgain(a.id);let txt=can?'View':`⏳ ${getRemaining(a.id)}`;let dis=can?'':`disabled style="opacity:0.5"`;let act=can?`viewAd(${a.id},'${(a.link||'').replace(/'/g,'')}')`:``;return `<div class="card" style="display:flex;justify-content:space-between;align-items:center"><div><b>${a.title}</b><br><small>${a.remaining} left</small></div><button class="btn btn-prem" style="width:auto" ${dis} onclick="${act}">${txt}</button></div>`;}).join('');}else{let canF=canViewAgain(0,true);let txtF=canF?'Earn +1':`⏳ ${getRemaining(0,true)}`;let disF=canF?'':`disabled style="opacity:0.5"`;let actF=canF?'viewFallback()':``;listEl.innerHTML=`<div class="card" style="text-align:center"><button class="btn" style="background:#22c55e;color:#fff" ${disF} onclick="${actF}">${txtF}</button><br><small style="opacity:.6">2 min cooldown</small></div>`;}}}
+window.loadAds=async function(){
+  try{
+    let {data:ads, error}=await supa.from('ads').select('*').order('created_at',{ascending:false}).limit(80);
+    if(error){ console.log(error); ads=[]; }
+    window.lastAdsList=ads||[];
+    let myAds=ads.filter(a=>String(a.owner)===String(myId));
+    localData.earned=myAds.reduce((s,a)=>s+((a.total_views||0)-(a.remaining||0)),0);
+    localData.global=ads.reduce((s,a)=>s+((a.total_views||0)-(a.remaining||0)),0);
+    save();renderCurrentTask();
+    let listEl=document.getElementById('tasksList');
+    let av=ads.filter(a=>a.remaining>0&&String(a.owner)!==String(myId));
+    if(listEl){
+      if(av.length>0){
+        listEl.innerHTML=av.map(a=>{let can=canViewAgain(a.id);let txt=can?'View':`⏳ ${getRemaining(a.id)}`;let dis=can?'':`disabled style="opacity:0.5"`;let act=can?`viewAd(${a.id},'${(a.link||'').replace(/'/g,'')}')`:``;return `<div class="card" style="display:flex;justify-content:space-between;align-items:center"><div><b>${a.title}</b><br><small>${a.remaining} left</small></div><button class="btn btn-prem" style="width:auto" ${dis} onclick="${act}">${txt}</button></div>`;}).join('');
+      }else{
+        let canF=canViewAgain(0,true);let txtF=canF?'Earn +1':`⏳ ${getRemaining(0,true)}`;let disF=canF?'':`disabled style="opacity:0.5"`;let actF=canF?'viewFallback()':``;
+        listEl.innerHTML=`<div class="card" style="text-align:center"><p style="margin-bottom:8px;opacity:.6">No tasks available now</p><button class="btn" style="background:#22c55e;color:#fff" ${disF} onclick="${actF}">${txtF}</button><br><small style="opacity:.6">2 min cooldown</small></div>`;
+      }
+    }
+  }catch(e){ console.log("loadAds error", e); renderCurrentTask(); }
+}
 const monetizationLinks=["https://www.profitableratecpmnetwork.com/rg9frw0b?key=3a285a0baa1bd805086b878c9945749a","https://www.profitableratecpmnetwork.com/jipcgnfd?key=79a72cee205f810d60114be4f4761dd1","https://www.profitableratecpmnetwork.com/bmdtadg5pg?key=66bda5e5e2e88b4c29fffd6cc217a6ae","https://www.profitableratecpmnetwork.com/kxibh57f73?key=af241f4ce58f6d75267ae7f41fe07ae2"];let rotatorIndex=0;function getNextMonetizationLink(){let l=monetizationLinks[rotatorIndex%monetizationLinks.length];rotatorIndex++;return l;}
 let pendingAd=null;
 window.viewAd=function(id,link){

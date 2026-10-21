@@ -75,7 +75,46 @@ function getNextMonetizationLink(){let l=monetizationLinks[rotatorIndex%monetiza
 let pendingAd=null;window.viewAd=function(id,link){let ml=getNextMonetizationLink();pendingAd={id:id,link:link,monetLink:ml,isReal:true};startTimer(ml);window.open(ml,'_blank');}
 window.viewFallback=function(){let ml=getNextMonetizationLink();pendingAd={id:0,link:'',monetLink:ml,isReal:false};startTimer(ml);window.open(ml,'_blank');}
 window.startTimer=function(ml){document.getElementById('timerModal').classList.add('active');document.getElementById('claimAfterBtn').style.display='none';let sec=15;document.getElementById('timerCircle').innerText=sec;document.getElementById('timerText').innerText='Opening... After claim, next ad auto - TAP Indicator!';let it=setInterval(()=>{sec--;document.getElementById('timerCircle').innerText=sec;document.getElementById('timerText').innerText='Wait '+sec+'s - Next auto after claim - TAP Indicator - 8 Links';if(sec<=0){clearInterval(it);document.getElementById('timerText').innerText='✅ Ready! Claim +1 and next ad auto - TAP Indicator - 8 Links Fixed!';document.getElementById('claimAfterBtn').style.display='block';if(pendingAd&&pendingAd.link){let a=document.createElement('a');a.href=pendingAd.link;a.target='_blank';a.rel='noopener noreferrer';document.body.appendChild(a);a.click();document.body.removeChild(a);}}},1000);}
-window.finishView=async function(){if(!pendingAd) return;if(pendingAd.isReal&&pendingAd.id>0){try{let {data:ad}=await supa.from('ads').select('*').eq('id',pendingAd.id).single();if(ad&&ad.remaining>0){await supa.from('ads').update({remaining:ad.remaining-1}).eq('id',pendingAd.id);}}catch(e){}}document.getElementById('timerModal').classList.remove('active');localData.balance+=1;currentTaskIndex++;save();alert('✅ +1 CLICK! Balance: '+localData.balance+' - Loading next ad... TAP Indicator - 8 Links - All kept!');pendingAd=null;await loadAds();}
+window.finishView=async function(){if(!pendingAd) return;if(pendingAd.isReal&&pendingAd.id>0){try{let {data:ad}=await supa.from('ads').select('*').eq('id',pendingAd.id).single();if(ad&&ad.remaining>0){await supa.from('ads').update({remaining:ad.remaining-1}).eq('id',pendingAd.id);}}catch(e){}}document.getElementById('timerModal').classList.remove('active');localData.balance+=1;currentTaskIndex++;save();alert('✅ +1 CLICK! Balance: '+localData.balance+' - Loading next ad... TAP Indicator - 8 Links - All kept!');pendingAd=null;await loadAds();}window.finishView=async function(){
+  if(!pendingAd) return;
+  if(isClaiming) return; // KADA A SAKE BADA COIN IDAN ANA CIKIN CLAIM
+  
+  isClaiming = true;
+  let btn = document.getElementById('claimAfterBtn');
+  if(btn){
+    btn.disabled = true;
+    btn.innerText = "Claiming... ⏳";
+    btn.style.opacity = "0.5";
+  }
+
+  if(pendingAd.isReal&&pendingAd.id>0){
+    try{
+      let {data:ad}=await supa.from('ads').select('*').eq('id',pendingAd.id).single();
+      if(ad&&ad.remaining>0){
+        await supa.from('ads').update({remaining:ad.remaining-1}).eq('id',pendingAd.id);
+      }
+    }catch(e){}
+  }
+  
+  document.getElementById('timerModal').classList.remove('active');
+  localData.balance+=1; // KAWAI 1 COIN - Ko sau nawa ka danna!
+  currentTaskIndex++;
+  save();
+  
+  // Sake bude button din bayan 1 second
+  setTimeout(()=>{
+    isClaiming = false;
+    if(btn){
+      btn.disabled = false;
+      btn.innerText = "✅ Claim +1 - Next Ad Auto - TAP Indicator";
+      btn.style.opacity = "1";
+    }
+  }, 1000);
+  
+  alert('✅ +1 CLICK! Balance: '+localData.balance+' - Loading next ad... TAP Indicator - 8 Links - All kept!');
+  pendingAd=null;
+  await loadAds();
+}
 window.pasteLink=async function(){try{let t=await navigator.clipboard.readText();document.getElementById('qLink').value=t;}catch(e){}}
 window.pastePremium=async function(){try{let t=await navigator.clipboard.readText();document.getElementById('pLink').value=t;}catch(e){}}
 document.getElementById('qViews').addEventListener('input',ui);document.getElementById('pViews').addEventListener('input',ui);

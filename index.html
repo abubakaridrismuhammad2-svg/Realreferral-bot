@@ -72,7 +72,8 @@ let supa=null; try{ supa=supabase.createClient(SUPABASE_URL,SUPABASE_KEY); }catc
 let myId=7741288581; let user={id:myId,first_name:"User"};
 let localData={balance:292,earned:0,global:0,joined:[]};
 try{let s=localStorage.getItem('rr_v19_tap'); if(s){localData={...localData,...JSON.parse(s)};} }catch(e){}
-let currentTaskIndex=0; let linkCooldown={}; try{linkCooldown=JSON.parse(localStorage.getItem('rr_link_cooldown')||'{}');}catch(e){}
+let currentTaskIndex=0; 
+try{ currentTaskIndex=parseInt(localStorage.getItem('rr_current_index')||'0'); }catch(e){}
 let rotatorIndex=0; try{rotatorIndex=parseInt(localStorage.getItem('rr_rotator')||'0');}catch(e){}
 let pendingAd=null; let isClaiming=false;
 const monetizationLinks=["https://www.profitableratecpmnetwork.com/rg9frw0b?key=3a285a0baa1bd805086b878c9945749a","https://www.profitableratecpmnetwork.com/jipcgnfd?key=79a72cee205f810d60114be4f4761dd1","https://www.profitableratecpmnetwork.com/bmdtadg5pg?key=66bda5e5e2e88b4c29fffd6cc217a6ae","https://www.profitableratecpmnetwork.com/kxibh57f73?key=af241f4ce58f6d75267ae7f41fe07ae2","https://omg10.com/4/11920289","https://omg10.com/4/11920288","https://omg10.com/4/11920287","https://omg10.com/4/10943082"];

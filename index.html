@@ -102,7 +102,31 @@ window.showGigaReward=async function(){
     startTimer(demo[0]);
   }catch(e){ localData.balance+=1; save(); }
 }
-window.finishView=async function(){ if(!pendingAd||isClaiming) return; isClaiming=true; if(pendingAd.isReal&&pendingAd.id>0&&supa){ try{ let {data:ad}=await supa.from('ads').select('*').eq('id',pendingAd.id).single(); if(ad&&ad.remaining>0){ await supa.from('ads').update({remaining:ad.remaining-1}).eq('id',pendingAd.id); } }catch(e){} } let m=document.getElementById('timerModal'); if(m) m.classList.remove('active'); localData.balance+=1; save(); alert('✅ +1 Point! Balance: '+localData.balance); pendingAd=null; isClaiming=false; await loadAds(); }
+window.finishView=async function(){
+  if(!pendingAd||isClaiming) return;
+  isClaiming=true;
+  
+  if(pendingAd.isReal && pendingAd.id>0 && supa){
+    try{
+      let {data:ad}=await supa.from('ads').select('*').eq('id',pendingAd.id).single();
+      if(ad && ad.remaining>0){
+        await supa.from('ads').update({remaining:ad.remaining-1}).eq('id',pendingAd.id);
+      }
+    }catch(e){}
+  }
+  
+  let m=document.getElementById('timerModal'); if(m) m.classList.remove('active');
+  localData.balance+=1; save();
+  alert('✅ +1 Point! Balance: '+localData.balance);
+  
+  // YAWUCE - WANI YA ZO
+  if(pendingAd.isReal && pendingAd.id>0){
+    currentTaskIndex++;
+    try{ localStorage.setItem('rr_current_index', String(currentTaskIndex)); }catch(e){}
+  }
+  
+  pendingAd=null; isClaiming=false; await loadAds();
+}
 window.openAddWizard=function(){ let a=document.getElementById('addWizard'); if(a) a.classList.add('active'); wizNext(1); }
 window.closeWizard=function(){ let a=document.getElementById('addWizard'); if(a) a.classList.remove('active'); }
 window.wizNext=function(n){ document.getElementById('wiz1').style.display=n==1?'block':'none'; document.getElementById('wiz2').style.display=n==2?'block':'none'; document.getElementById('wiz3').style.display=n==3?'block':'none'; document.getElementById('stepLabel').innerText='STEP '+n+' OF 3'; document.getElementById('bar1').style.background=n>=1?'#0F172A':'#E2E8F0'; document.getElementById('bar2').style.background=n>=2?'#0F172A':'#E2E8F0'; document.getElementById('bar3').style.background=n>=3?'#0F172A':'#E2E8F0'; }

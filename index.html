@@ -1,0 +1,177 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>V39 Hybrid Most Effective</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7/dist/umd/supabase.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
+body{background:#F8FAFC;padding:12px;padding-bottom:120px}
+.top{background:#fff;border:1px solid #E2E8F0;border-radius:16px;padding:12px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:8px;z-index:10}
+.pill{background:#0F172A;color:#fff;border-radius:99px;padding:6px 12px;font-weight:800;font-size:12px}
+.card{background:#fff;border:1px solid #E2E8F0;border-radius:16px;padding:12px;margin-bottom:10px}
+.btn{background:#0F172A;color:#fff;border:none;border-radius:99px;padding:10px 16px;font-weight:700;cursor:pointer}
+.page{display:none}.page.active{display:block}
+.nav{position:fixed;bottom:10px;left:10px;right:10px;background:#fff;border:1px solid #E2E8F0;border-radius:18px;display:flex;padding:6px;z-index:999;box-shadow:0 8px 20px rgba(0,0,0,.1)}
+.nav div{flex:1;text-align:center;opacity:.5;padding:7px;border-radius:12px;cursor:pointer;font-size:10px;font-weight:700}.nav div.active{opacity:1;background:#0F172A;color:#fff}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:1000;padding:16px}.modal.active{display:flex}
+.circle{width:64px;height:64px;border:3px solid #0F172A;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:900;margin:12px auto;background:#fff}
+.row{display:flex;justify-content:space-between;align-items:center;padding:10px;border:1px solid #E2E8F0;border-radius:12px;margin-bottom:8px;background:#fff;text-decoration:none;color:#0F172A}
+</style></head><body>
+<div class="top"><b id="tTitle">Dashboard</b><div style="display:flex;gap:6px"><div class="pill" id="balTop">292 Points</div><button class="btn" onclick="loadHybrid()">Refresh</button></div></div>
+
+<div id="p-home" class="page active">
+<div class="card" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;text-align:center">
+<div><small style="font-size:9px;color:#64748B;font-weight:700">GLOBAL CLICKS</small><br><b id="g" style="font-size:20px">0</b><div>🌐</div></div>
+<div><small style="font-size:9px;color:#64748B;font-weight:700">CLICK BALANCE</small><br><b id="b" style="font-size:20px">292</b><br><button class="btn" style="font-size:10px;margin-top:4px;padding:5px 10px" onclick="openAdd()">+ Add</button></div>
+<div><small style="font-size:9px;color:#64748B;font-weight:700">CLICKS RECEIVED</small><br><b id="r" style="font-size:20px">0</b><div>📥</div></div>
+</div>
+<div class="card"><b style="font-size:13px">Daily Rewards - 8 Tasks</b><div id="monetGrid" style="margin-top:8px"></div><div style="text-align:center;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;padding:8px;margin-top:8px;font-size:11px;color:#64748B">8 tasks - Danna Open ka samu +1</div></div>
+<div style="font-size:10px;font-weight:800;color:#64748B;margin:12px 4px 6px">FEATURED TASK - IN KA KALLA, YAWUCE, WANI YAZO</div>
+<div id="featWrap" class="card" style="text-align:center"><b>Loading tasks...</b></div>
+<div style="font-size:10px;font-weight:800;color:#64748B;margin:12px 4px 6px">MY CAMPAIGNS - <span id="myBadge">0/3</span></div>
+<div id="myWrap"><div class="card"><button class="btn" style="width:100%;padding:12px" onclick="openAdd()">+ Add your first task</button></div></div>
+</div>
+
+<div id="p-tasks" class="page"><div id="tasksList"></div></div>
+<div id="p-premium" class="page"><div id="premList"><div class="card" style="text-align:center">No premium yet</div></div></div>
+<div id="p-groups" class="page"><div class="card"><b>Community Groups - Join +5</b><div style="margin-top:10px"><a class="row" href="https://t.me/+Rwe4riOGKPszMTI0" target="_blank"><span><b>Main Group</b><br><small>Join to earn +5</small></span><span class="pill">+5</span></a><a class="row" href="https://t.me/+Eyd0Z_uqQGM5ZjI0" target="_blank"><span><b>Community Group</b><br><small>Join to earn +5</small></span><span class="pill">+5</span></a></div></div></div>
+<div id="p-invite" class="page"><div class="card" style="text-align:center"><b>Invite & Earn 10%</b><div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:10px;margin:10px 0;font-size:11px;word-break:break-all" id="ref">https://t.me/realreferralAdsbot?start=7741288581</div><button class="btn" style="width:100%" onclick="copyRef()">Copy Link</button></div></div>
+
+<div class="nav"><div class="active" onclick="showPage('home',0)">🏠<br>Home</div><div onclick="showPage('tasks',1)">⚡<br>Tasks</div><div onclick="showPage('premium',2)">💎<br>Premium</div><div onclick="showPage('groups',3)">👥<br>Groups</div><div onclick="showPage('invite',4)">👤<br>Invite</div></div>
+
+<div id="timerModal" class="modal"><div class="card" style="width:100%;max-width:320px;text-align:center"><h3>Please wait 15s</h3><div class="circle" id="timerNum">15</div><p style="font-size:11px;color:#64748B">Verifying - Task remaining zai ragu -1</p><button class="btn" id="claimBtn" style="display:none;width:100%;margin-top:12px;padding:14px" onclick="claimReal()">Claim +1 Point</button></div></div>
+
+<div id="addModal" class="modal"><div class="card" style="width:100%;max-width:360px"><div style="display:flex;justify-content:space-between"><b>Add Task</b><button onclick="closeAdd()" style="width:28px;height:28px;border:1px solid #E2E8F0;border-radius:8px;background:#fff">X</button></div><input id="inLink" placeholder="https://t.me/your_channel" style="width:100%;padding:10px;border:1px solid #E2E8F0;border-radius:10px;margin-top:10px"><input id="inTitle" placeholder="Title" value="t.me" style="width:100%;padding:10px;border:1px solid #E2E8F0;border-radius:10px;margin-top:8px"><div style="display:flex;gap:6px;margin-top:8px"><input id="inViews" type="number" value="20" style="flex:1;padding:10px;border:1px solid #E2E8F0;border-radius:10px;text-align:center;font-weight:800"><button class="btn" style="flex:1" onclick="addReal()">Add Task</button></div><div id="cost" style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;padding:8px;margin-top:8px;font-size:12px">Costs 20 Points</div></div></div>
+
+<script>
+const SUP_URL="https://hgdxkzzgzmiropkrdfhm.supabase.co";
+const SUP_KEY="sb_publishable_8jJGMNp-44jHaeJfe2MwNw_yv9x100O";
+let supa=null; try{ supa=supabase.createClient(SUP_URL,SUP_KEY); }catch(e){ supa=null; }
+let myId=7741288581, balance=292, gClicks=0, rClicks=0, curIdx=0, pending=null, allAds=[], usingDemo=false;
+
+let monet=[
+"https://www.profitableratecpmnetwork.com/rg9frw0b?key=3a285a0baa1bd805086b878c9945749a",
+"https://www.profitableratecpmnetwork.com/jipcgnfd?key=79a72cee205f810d60114be4f4761dd1",
+"https://www.profitableratecpmnetwork.com/bmdtadg5pg?key=66bda5e5e2e88b4c29fffd6cc217a6ae",
+"https://www.profitableratecpmnetwork.com/kxibh57f73?key=af241f4ce58f6d75267ae7f41fe07ae2",
+"https://omg10.com/4/11920289","https://omg10.com/4/11920288","https://omg10.com/4/11920287","https://omg10.com/4/10943082"
+];
+let demoAds=[
+{id:101,title:"Demo Task 1 - t.me/demo1",link:"https://t.me/demo1",remaining:20,total_views:20,owner:999,owner_name:"Demo User"},
+{id:102,title:"Demo Task 2 - t.me/demo2",link:"https://t.me/demo2",remaining:15,total_views:20,owner:998,owner_name:"Demo User 2"},
+{id:103,title:"Demo Task 3 - t.me/demo3",link:"https://t.me/demo3",remaining:50,total_views:50,owner:997,owner_name:"Demo User 3"}
+];
+
+function ui(){
+document.getElementById('b').innerText=balance;
+document.getElementById('balTop').innerText=balance+' Points';
+document.getElementById('g').innerText=gClicks;
+document.getElementById('r').innerText=rClicks;
+let v=document.getElementById('inViews'); if(v) document.getElementById('cost').innerText='Costs '+(v.value||20)+' Points';
+}
+function drawMonet(){
+document.getElementById('monetGrid').innerHTML=monet.map((m,i)=>`<a href="${m}" target="_blank" onclick="openTimer(false)" class="row"><span><b>Task ${i+1}</b><br><small>+1 Point</small></span><span class="pill">Open</span></a>`).join('');
+}
+function renderAll(ads){
+let list=ads||allAds;
+if(!list || list.length==0){ list=demoAds; usingDemo=true; allAds=demoAds; }
+let avail=list.filter(a=>a.remaining>0 && String(a.owner)!==String(myId));
+if(avail.length==0){
+document.getElementById('featWrap').innerHTML=`<b>No tasks available</b><br><small>Be first to add task - ${usingDemo?'(Demo Mode)':'(Real Mode)'}</small>`;
+return;
+}
+if(curIdx>=avail.length) curIdx=0;
+let a=avail[curIdx];
+let modeLabel=usingDemo?'DEMO':'REAL - Remaining zai ragu';
+document.getElementById('featWrap').innerHTML=`<div style="text-align:left"><div style="display:flex;justify-content:space-between"><b style="font-size:12px">${a.title} • ${curIdx+1}/${avail.length} • ${modeLabel}</b><span class="pill" style="font-size:10px">${a.remaining} left / ${a.total_views}</span></div><div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:10px;margin-top:8px;display:flex;justify-content:space-between;align-items:center"><div style="flex:1"><small style="color:#64748B">In ka kalla, yawuce, wani yazo</small><br><small style="word-break:break-all;font-weight:700;font-size:11px">${a.link}</small></div><button class="btn" onclick="viewTask(${a.id})">Visit</button></div></div>`;
+
+document.getElementById('tasksList').innerHTML=avail.map(ad=>`<div class="card"><div style="display:flex;justify-content:space-between"><b style="font-size:12px">${ad.title}</b><span class="pill" style="font-size:10px">${ad.remaining}/${ad.total_views}</span></div><div style="font-size:11px;word-break:break-all;margin:8px 0">${ad.link}</div><button class="btn" style="width:100%" onclick="viewTask(${ad.id})">View - ${usingDemo?'Demo':'Real'}</button></div>`).join('');
+
+let my=list.filter(ad=>String(ad.owner)===String(myId));
+document.getElementById('myBadge').innerText=my.length+'/3';
+let myWrap=document.getElementById('myWrap');
+if(my.length>0){
+myWrap.innerHTML=my.map(ad=>`<div class="card"><div style="display:flex;justify-content:space-between"><b style="font-size:11px">${ad.title}</b><button onclick="delTask(${ad.id})" style="background:#FEF2F2;color:#DC2626;border:1px solid #FECACA;border-radius:6px;padding:3px 8px;font-size:10px">Delete</button></div><div style="font-size:11px;word-break:break-all;margin:6px 0">${ad.link}</div><div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;padding:6px;display:flex;justify-content:space-between"><small>${ad.remaining} remaining</small><small style="background:#0F172A;color:#fff;padding:2px 6px;border-radius:99px">${ad.total_views-ad.remaining}/${ad.total_views}</small></div></div>`).join('');
+}
+}
+
+async function loadHybrid(){
+try{
+if(!supa) throw new Error("Supabase not loaded");
+let {data, error} = await supa.from('ads').select('*').order('created_at',{ascending:false}).limit(150);
+if(error) throw error;
+if(!data || data.length==0){ usingDemo=true; allAds=demoAds; gClicks=45; rClicks=5; ui(); renderAll(demoAds); return; }
+allAds=data; usingDemo=false;
+let myAds=data.filter(a=>String(a.owner)===String(myId));
+rClicks=myAds.reduce((s,a)=>s+((a.total_views||0)-(a.remaining||0)),0);
+gClicks=data.reduce((s,a)=>s+((a.total_views||0)-(a.remaining||0)),0);
+ui(); renderAll(data);
+} catch(e){
+usingDemo=true; allAds=demoAds; gClicks=45; rClicks=5; ui(); renderAll(demoAds);
+console.log("Fallback to demo:", e.message);
+}
+}
+let rot=0;
+function viewTask(id){
+let ad=allAds.find(a=>a.id===id);
+if(!ad) return;
+let m=monet[rot%monet.length]; rot++;
+pending={id:id, monet:m};
+window.open(m,'_blank');
+openTimer(true);
+}
+function openTimer(isReal){
+let modal=document.getElementById('timerModal'); modal.classList.add('active');
+let btn=document.getElementById('claimBtn'); btn.style.display='none';
+let sec=15; let num=document.getElementById('timerNum'); num.innerText=sec;
+let iv=setInterval(()=>{ sec--; num.innerText=sec; if(sec<=0){ clearInterval(iv); btn.style.display='block'; } },1000);
+}
+async function claimReal(){
+document.getElementById('timerModal').classList.remove('active');
+if(!pending) return;
+if(!usingDemo && supa && pending.id){
+try{
+let {data:ad}=await supa.from('ads').select('*').eq('id',pending.id).single();
+if(ad && ad.remaining>0){ await supa.from('ads').update({remaining: ad.remaining-1}).eq('id', pending.id); }
+} catch(e){}
+}
+balance+=1; curIdx++; ui();
+alert(`✅ +1 Point! Balance: ${balance}\n${usingDemo?'(Demo Mode - Bai ragu a DB ba)':'(Real Mode - Remaining ya ragu -1 a Supabase!)'}\nYawuce, wani yazo!`);
+pending=null;
+await loadHybrid();
+}
+function showPage(p,i){
+document.querySelectorAll('.page').forEach(el=>el.classList.remove('active'));
+document.getElementById('p-'+p).classList.add('active');
+document.querySelectorAll('.nav div').forEach((el,idx)=>el.classList.toggle('active',idx===i));
+document.getElementById('tTitle').innerText=p.charAt(0).toUpperCase()+p.slice(1);
+if(p==='tasks') loadHybrid();
+}
+function openAdd(){ document.getElementById('addModal').classList.add('active'); }
+function closeAdd(){ document.getElementById('addModal').classList.remove('active'); }
+async function addReal(){
+let link=document.getElementById('inLink').value.trim();
+let title=document.getElementById('inTitle').value.trim()||'t.me';
+let views=parseInt(document.getElementById('inViews').value)||20;
+if(!link){ alert('Saka link'); return; }
+if(balance<views){ alert('Balance bai isa: '+balance); return; }
+balance-=views; ui();
+if(usingDemo || !supa){
+allAds.unshift({id:Date.now(),title:title,link:link,remaining:views,total_views:views,owner:myId,owner_name:'You'});
+closeAdd(); renderAll(allAds); alert('Task added (Demo Mode)'); return;
+}
+try{
+let {error}=await supa.from('ads').insert([{title:title,link:link,total_views:views,remaining:views,owner:myId,owner_name:'User'}]);
+if(error) throw error;
+closeAdd(); alert('Task added (Real Mode - Mutane za su gani!)'); loadHybrid();
+} catch(e){ alert(e.message); balance+=views; ui(); }
+}
+async function delTask(id){
+if(!confirm('Delete?')) return;
+if(usingDemo || !supa){ allAds=allAds.filter(a=>a.id!==id); renderAll(allAds); return; }
+try{ await supa.from('ads').delete().eq('id',id); loadHybrid(); }catch(e){ alert(e.message); }
+}
+function copyRef(){
+let t=document.getElementById('ref').innerText;
+if(navigator.clipboard){ navigator.clipboard.writeText(t).then(()=>alert('Copied!')); } else { alert(t); }
+}
+ui(); drawMonet(); loadHybrid();
+</script></body></html>

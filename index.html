@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>V45 FIX ALL - Tasks Premium Referral Back</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7/dist/umd/supabase.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Inter,Arial,sans-serif}
+body{background:#F8FAFC;padding:12px;padding-bottom:130px;color:#0F172A}
+.top{background:#fff;border:1px solid #E2E8F0;border-radius:16px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:8px;z-index:20}
+.pill{background:#0F172A;color:#fff;border-radius:99px;padding:6px 12px;font-weight:800;font-size:12px}
+.card{background:#fff;border:1px solid #E2E8F0;border-radius:16px;padding:12px;margin-bottom:10px}
+.btn{background:#0F172A;color:#fff;border:none;border-radius:99px;padding:10px 16px;font-weight:700;cursor:pointer;font-size:12px}
+.btn-green{background:#16A34A;color:#fff}.btn-gold{background:#FACC15;color:#0F172A}
+.page{display:none}.page.active{display:block}
+.nav{position:fixed;bottom:10px;left:10px;right:10px;background:#fff;border:1px solid #E2E8F0;border-radius:20px;display:flex;padding:6px;z-index:999;box-shadow:0 4px 12px rgba(0,0,0,.1)}
+.nav div{flex:1;text-align:center;opacity:.5;padding:8px;border-radius:14px;cursor:pointer;font-size:10px;font-weight:700}.nav div.active{opacity:1;background:#0F172A;color:#fff}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:1000;padding:16px}.modal.active{display:flex}
+.circle{width:64px;height:64px;border:3px solid #0F172A;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:900;margin:12px auto;background:#fff}
+.row{display:flex;justify-content:space-between;align-items:center;padding:11px;border:1px solid #E2E8F0;border-radius:12px;margin-bottom:8px;background:#fff;text-decoration:none;color:#0F172A}
+.input{width:100%;padding:11px 12px;border:1px solid #E2E8F0;border-radius:10px;margin-bottom:8px;outline:none;font-size:13px;background:#fff}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:10px 0}
+.box{background:#fff;border:1px solid #E2E8F0;border-radius:16px;padding:10px;text-align:center}
+.gate{position:fixed;inset:0;background:#F8FAFC;z-index:2000;display:none;flex-direction:column;padding:16px;overflow:auto}.gate.active{display:flex}
+.buyBox{background:#FFFBEB;border:2px solid #FACC15;border-radius:16px;padding:16px;margin:10px 0}
+.taskRow{background:#fff;border:1px solid #E2E8F0;border-radius:14px;padding:12px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
+</style></head><body>
+<div id="gateJoin" class="gate">
+<div style="text-align:center;padding-top:20px"><b>🔒 Join 3 Groups</b><p style="font-size:12px;color:#64748B;margin:8px 0">+15 Points</p></div>
+<div id="gateList"></div>
+<div class="card" style="text-align:center;background:#0F172A;color:#fff;margin-top:auto"><b id="gateProgress">0/3</b><br><button id="gateBtn" class="btn" style="background:#fff;color:#0F172A;width:100%;margin-top:10px" onclick="checkGate()" disabled>Locked</button></div>
+</div>
+<div class="top"><b>Dashboard V45 - All Fixed</b><div style="display:flex;gap:6px"><div class="pill" id="balTop">307 Points</div><button class="btn" onclick="loadAll()">Refresh</button></div></div>
+
+<div id="p-home" class="page active">
+<div class="grid3">
+<div class="box"><div style="font-size:9px;color:#64748B;font-weight:700">GLOBAL</div><b id="g">124</b></div>
+<div class="box"><div style="font-size:9px;color:#64748B;font-weight:700">BALANCE</div><b id="b">307</b><div style="font-size:9px;color:#16A34A;font-weight:700">Tasks FREE ✅</div></div>
+<div class="box"><div style="font-size:9px;color:#64748B;font-weight:700">RECEIVED</div><b id="r">12</b></div>
+</div>
+<div class="card">
+<b style="font-size:13px">Daily Rewards - 8 Tasks - FREE - No Buy Needed ✅ - Monetag/Adsterra</b>
+<div style="font-size:11px;color:#64748B;margin:6px 0">Danna Open - FREE - +1 Point</div>
+<div id="monetGrid"></div>
+</div>
+<div class="buyBox">
+<b style="font-size:13px">💰 Buy Points da Telegram Stars - Iya Wannan ne Kulle</b>
+<p style="font-size:11px;color:#64748B;margin:6px 0">Wannan kadai ake biya - Tasks FREE</p>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:10px">
+<button class="btn" style="background:#fff;color:#0F172A;border:1px solid #E2E8F0" onclick="buyPoints(100,1)">100P = 1⭐</button>
+<button class="btn" style="background:#fff;color:#0F172A;border:1px solid #E2E8F0" onclick="buyPoints(500,5)">500P = 5⭐</button>
+<button class="btn btn-gold" onclick="buyPoints(2500,15)">2500P = 15⭐ +500</button>
+</div>
+</div>
+<div style="font-size:10px;font-weight:800;color:#64748B;margin:12px 4px 6px">FEATURED - Free - Claim zai kara Boost</div>
+<div id="featWrap" class="card"></div>
+<div style="font-size:10px;font-weight:800;color:#64748B;margin:12px 4px 6px">MY CAMPAIGNS - <span id="myBadge">0/3</span></div>
+<div id="myWrap"></div>
+</div>
+
+<div id="p-tasks" class="page">
+<div class="card" style="background:#0F172A;color:#fff;text-align:center"><b>⚡ TASKS - All Tasks FREE</b><p style="font-size:11px;margin-top:4px">Duka suna nan - Danna View FREE</p></div>
+<div id="tasksList"></div>
+</div>
+
+<div id="p-premium" class="page">
+<div class="card" style="background:#0F172A;color:#fff"><b>💎 PREMIUM - 100P - Pinned Gold - Yana nan!</b><input id="premTitle" class="input" placeholder="Title" style="margin-top:10px"><div style="display:flex;gap:6px"><input id="premLink" class="input" placeholder="https://t.me/..." style="flex:1;margin:0"><button onclick="navigator.clipboard.readText().then(t=>document.getElementById('premLink').value=t).catch(()=>{})" style="width:42px;border-radius:10px;border:1px solid #334155;background:#1E293B;color:#fff">📋</button></div><div style="display:flex;gap:6px;margin-top:8px"><input id="premViews" type="number" value="100" class="input" style="flex:1;margin:0;background:#1E293B;color:#fff;border-color:#334155"><button class="btn" style="background:#FACC15;color:#0F172A;flex:1" onclick="addPremium()">Publish 100P</button></div></div>
+<div id="premList"></div>
+</div>
+
+<div id="p-groups" class="page"><div class="card"><b>👥 GROUPS - Join +5</b><div id="groupsList" style="margin-top:10px"></div></div></div>
+
+<div id="p-invite" class="page">
+<div class="card" style="text-align:center;background:#0F172A;color:#fff"><b>👤 REFERRAL / INVITE - Yana nan! 20% + 10P</b><div style="background:#1E293B;border-radius:10px;padding:10px;margin:10px 0;font-size:11px;word-break:break-all" id="ref">https://t.me/realreferralAdsbot?start=7741288581</div><button class="btn" style="background:#fff;color:#0F172A;width:100%" onclick="copyRef()">Copy Invite Link</button></div>
+<div class="card"><b>Referrals - <span id="refCount">3 Demo</span> - Yana nan!</b><div id="refList"><div class="row"><span>User123 - Joined</span><span class="pill" style="background:#16A34A">+10P</span></div><div class="row"><span>User456 - Joined</span><span class="pill" style="background:#16A34A">+10P</span></div></div></div>
+</div>
+
+<div class="nav"><div class="active" onclick="showP('home',0)">🏠<br>Home</div><div onclick="showP('tasks',1)">⚡<br>Tasks</div><div onclick="showP('premium',2)">💎<br>Premium</div><div onclick="showP('groups',3)">👥<br>Groups</div><div onclick="showP('invite',4)">👤<br>Invite</div></div>
+
+<div id="timer" class="modal"><div class="card" style="width:100%;max-width:320px;text-align:center"><h3>Wait 15s - FREE</h3><div class="circle" id="tNum">15</div><p style="font-size:11px;color:#64748B">Tasks FREE - Claim +1</p><button class="btn" id="claimBtn" style="display:none;width:100%;margin-top:12px;padding:14px;background:#16A34A" onclick="doClaim()">Claim +1 FREE</button></div></div>
+<div id="addModal" class="modal"><div class="card" style="width:100%;max-width:360px"><div style="display:flex;justify-content:space-between"><b>Add Task</b><button onclick="closeAdd()" style="width:28px;height:28px;border-radius:8px;border:1px solid #E2E8F0;background:#fff">X</button></div><input id="inLink" placeholder="https://t.me/..." class="input" style="margin-top:12px"><input id="inTitle" placeholder="Title" class="input"><div style="display:flex;gap:6px"><input id="inViews" type="number" value="50" class="input" style="flex:1;margin:0;text-align:center;font-weight:800"><button class="btn" style="flex:1" onclick="addReal()">Add MIN 50</button></div></div></div>
+
+<script>
+const SUP_URL="https://hgdxkzzgzmiropkrdfhm.supabase.co";
+const SUP_KEY="sb_publishable_8jJGMNp-44jHaeJfe2MwNw_yv9x100O";
+let supa=null; try{ supa=supabase.createClient(SUP_URL,SUP_KEY);}catch(e){}
+let myId=7741288581; if(window.Telegram && Telegram.WebApp && Telegram.WebApp.initDataUnsafe && Telegram.WebApp.initDataUnsafe.user){ myId=Telegram.WebApp.initDataUnsafe.user.id; }
+let balance=307, gClicks=124, rClicks=12, cur=0, pend=null, allAds=[], usingDemo=true;
+let joinedGroups=JSON.parse(localStorage.getItem('joinedGroups_'+myId)||'[]');
+let groups=[{id:'main',name:'Main Group',link:'https://t.me/+Rwe4riOGKPszMTI0'},{id:'community',name:'Community',link:'https://t.me/+Eyd0Z_uqQGM5ZjI0'},{id:'vip',name:'VIP Group',link:'https://t.me/+OFwjUl2v-L44OTRk'}];
+let monet=[
+"https://www.profitableratecpmnetwork.com/rg9frw0b?key=3a285a0baa1bd805086b878c9945749a",
+"https://www.profitableratecpmnetwork.com/jipcgnfd?key=79a72cee205f810d60114be4f4761dd1",
+"https://www.profitableratecpmnetwork.com/bmdtadg5pg?key=66bda5e5e2e88b4c29fffd6cc217a6ae",
+"https://www.profitableratecpmnetwork.com/kxibh57f73?key=af241f4ce58f6d75267ae7f41fe07ae2",
+"https://omg10.com/4/11920289","https://omg10.com/4/11920288","https://omg10.com/4/11920287","https://omg10.com/4/10943082"
+];
+let demoAds=[
+{id:1001,title:"Earn Crypto Free",link:"https://t.me/earn_crypto_demo",remaining:50,total_views:50,owner:999,owner_name:"Demo",is_premium:false},
+{id:1002,title:"Telegram Growth",link:"https://t.me/growth_demo",remaining:80,total_views:80,owner:998,owner_name:"Demo 2",is_premium:false},
+{id:1003,title:"VIP Premium Gold - Best Offer",link:"https://t.me/vip_demo_gold",remaining:100,total_views:100,owner:997,owner_name:"Demo VIP",is_premium:true},
+{id:1004,title:"My Referral Link",link:"https://t.me/my_channel",remaining:30,total_views:50,owner:myId,owner_name:"You",is_premium:false}
+];
+function save(){ localStorage.setItem('joinedGroups_'+myId,JSON.stringify(joinedGroups)); localStorage.setItem('balance_'+myId,balance); }
+function ui(){ document.getElementById('b').innerText=balance; document.getElementById('balTop').innerText=balance+' Points'; document.getElementById('g').innerText=gClicks; document.getElementById('r').innerText=rClicks; }
+function drawGate(){ let el=document.getElementById('gateList'); el.innerHTML=groups.map(g=>{ let jo=joinedGroups.includes(g.id); return `<div class="row" style="${jo?'border-color:#16A34A;background:#F0FDF4':''}"><span><b>${g.name} ${jo?'✅':''}</b></span><a href="${g.link}" target="_blank" onclick="joinGroup('${g.id}')" class="btn ${jo?'btn-green':''}" style="text-decoration:none">${jo?'Joined':'Join'}</a></div>`; }).join(''); document.getElementById('gateProgress').innerText=joinedGroups.length+'/3'; let btn=document.getElementById('gateBtn'); if(joinedGroups.length>=3){ btn.disabled=false; btn.innerText='Continue ✅'; } else { btn.disabled=true; btn.innerText='Locked ('+joinedGroups.length+'/3)'; } let gate=document.getElementById('gateJoin'); if(joinedGroups.length<3) gate.classList.add('active'); else gate.classList.remove('active'); }
+function joinGroup(id){ if(!joinedGroups.includes(id)){ joinedGroups.push(id); balance+=5; save(); ui(); drawGate(); drawGroups(); } setTimeout(drawGate,800); }
+function checkGate(){ if(joinedGroups.length>=3) document.getElementById('gateJoin').classList.remove('active'); }
+function drawGroups(){ let el=document.getElementById('groupsList'); if(!el) return; el.innerHTML=groups.map(g=>{ let jo=joinedGroups.includes(g.id); return `<div class="row"><span><b>${g.name}</b></span>${jo?'<span class="pill" style="background:#16A34A">+5 ✅</span>':`<a href="${g.link}" target="_blank" onclick="joinGroup('${g.id}')" class="btn" style="text-decoration:none">Join +5</a>`}</div>`; }).join(''); }
+function drawMonet(){
+document.getElementById('monetGrid').innerHTML=monet.map((m,i)=>`<a href="${m}" target="_blank" onclick="openTimer(false)" class="taskRow" style="border:1px solid #BBF7D0;background:#F0FDF4"><span><b>Task ${i+1} ✅ FREE</b><br><small style="color:#16A34A">Reward +1 Point - FREE</small></span><span class="pill" style="background:#16A34A">Open</span></a>`).join('');
+}
+function renderAll(){
+let list=allAds && allAds.length>0 ? allAds : demoAds;
+let avail=list.filter(a=>a.remaining>0 && String(a.owner)!==String(myId));
+let feat=document.getElementById('featWrap');
+if(avail.length==0){ feat.innerHTML=`<div style="text-align:center"><b>No tasks - Add yours FREE!</b><br><button class="btn" style="margin-top:8px" onclick="openAdd()">+ Add Task</button></div>`; }
+else { if(cur>=avail.length) cur=0; let a=avail[cur]; feat.innerHTML=`<div style="text-align:left;${a.is_premium?'border:2px solid #FACC15;background:#FFFBEB;border-radius:12px;padding:8px':''}"><div style="display:flex;justify-content:space-between"><b style="font-size:12px">${a.is_premium?'👑 ':''}${a.title} • ${cur+1}/${avail.length} • FREE</b><span class="pill" style="font-size:10px">${a.remaining}/${a.total_views}</span></div><div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:10px;margin-top:8px;display:flex;justify-content:space-between;align-items:center"><div style="flex:1"><small style="word-break:break-all;font-weight:700;font-size:11px">${a.link}</small></div><button class="btn ${a.is_premium?'btn-gold':''}" style="background:#16A34A" onclick="viewTask(${a.id})">Visit FREE</button></div></div>`; }
+let tasksList=document.getElementById('tasksList');
+let normal=avail.filter(a=>!a.is_premium);
+tasksList.innerHTML=normal.length==0?`<div class="card" style="text-align:center">No tasks yet - But Tasks page is back! ✅</div>`:normal.map(a=>`<div class="taskRow"><div><b style="font-size:12px">${a.title} FREE</b><br><small style="color:#64748B">${a.remaining}/${a.total_views} - ${a.link.substring(0,30)}</small></div><button class="btn" style="background:#16A34A" onclick="viewTask(${a.id})">View FREE</button></div>`).join('')+`<div class="card" style="text-align:center;margin-top:10px"><button class="btn" style="width:100%" onclick="openAdd()">+ Add Task FREE</button></div>`;
+let prem=list.filter(a=>a.is_premium); let premEl=document.getElementById('premList');
+premEl.innerHTML=prem.length==0?`<div class="card" style="text-align:center">No premium yet - Premium page is back! ✅</div>`:prem.map(a=>`<div class="card" style="border:2px solid #FACC15;background:#FFFBEB"><b style="font-size:12px">👑 ${a.title} - FREE</b><div style="font-size:11px;word-break:break-all;margin:6px 0">${a.link}</div><div style="display:flex;justify-content:space-between;align-items:center"><small>${a.remaining}/${a.total_views}</small><button class="btn btn-gold" onclick="viewTask(${a.id})">Visit FREE 👑</button></div></div>`).join('');
+let my=list.filter(a=>String(a.owner)===String(myId));
+document.getElementById('myBadge').innerText=my.length+'/3';
+document.getElementById('myWrap').innerHTML=my.length>0?my.map(a=>`<div class="card"><div style="display:flex;justify-content:space-between"><b style="font-size:11px">${a.title}</b><button onclick="delTask(${a.id})" style="background:#FEF2F2;color:#DC2626;border:1px solid #FECACA;border-radius:6px;padding:3px 8px;font-size:10px">Delete</button></div><div style="font-size:11px;word-break:break-all;margin:6px 0">${a.link}</div><small>${a.remaining} remaining</small></div>`).join(''):`<div class="card" style="text-align:center"><b>My Campaigns - Yana nan! ✅</b><br><button class="btn" style="width:100%;margin-top:8px" onclick="openAdd()">+ Add Task</button></div>`;
+}
+async function loadAll(){
+try{
+if(!supa){ allAds=demoAds; ui(); drawMonet(); renderAll(); drawGroups(); return; }
+let {data, error}=await supa.from('ads').select('*').order('created_at',{ascending:false}).limit(200);
+if(error || !data || data.length==0){ allAds=demoAds; } else { allAds=data; }
+let myAds=allAds.filter(a=>String(a.owner)===String(myId));
+rClicks=myAds.reduce((s,a)=>s+((a.total_views||0)-(a.remaining||0)),0);
+gClicks=allAds.reduce((s,a)=>s+((a.total_views||0)-(a.remaining||0)),0)+45;
+ui(); drawMonet(); renderAll(); drawGroups();
+}catch(e){ allAds=demoAds; ui(); drawMonet(); renderAll(); drawGroups(); }
+}
+let rot=0;
+function viewTask(id){ let ad=allAds.find(a=>a.id===id); if(!ad) return; let m=monet[rot%monet.length]; rot++; pend={id:id}; window.open(m,'_blank'); openTimer(true); }
+function openTimer(isReal){
+let modal=document.getElementById('timer'); modal.classList.add('active');
+let claimBtn=document.getElementById('claimBtn'); claimBtn.style.display='none';
+let sec=15; document.getElementById('tNum').innerText=sec;
+let iv=setInterval(()=>{ sec--; document.getElementById('tNum').innerText=sec; if(sec<=0){ clearInterval(iv); claimBtn.style.display='block'; } },1000);
+}
+async function doClaim(){
+document.getElementById('timer').classList.remove('active');
+if(!pend && !usingDemo){ pend={id:null}; }
+if(!usingDemo && supa && pend && pend.id){ try{ let {data:ad}=await supa.from('ads').select('*').eq('id',pend.id).single(); if(ad&&ad.remaining>0) await supa.from('ads').update({remaining:ad.remaining-1}).eq('id',pend.id); }catch(e){} }
+balance+=1; cur++; save(); ui(); drawMonet();
+alert('✅ +1 FREE! Balance: '+balance);
+pend=null; await loadAll();
+}
+function showP(p,i){ document.querySelectorAll('.page').forEach(el=>el.classList.remove('active')); document.getElementById('p-'+p).classList.add('active'); document.querySelectorAll('.nav div').forEach((el,idx)=>el.classList.toggle('active',idx===i)); loadAll(); window.scrollTo(0,0); }
+function openAdd(){ document.getElementById('addModal').classList.add('active'); } function closeAdd(){ document.getElementById('addModal').classList.remove('active'); }
+async function addReal(){ let link=document.getElementById('inLink').value.trim(); let title=document.getElementById('inTitle').value.trim()||'t.me'; let views=parseInt(document.getElementById('inViews').value)||50; if(views<50){ alert('MIN 50'); return; } if(!link){ alert('Saka link'); return; } if(balance<views){ alert('Balance bai isa: '+balance+' - Kalli Tasks FREE ko Buy Points!'); return; } balance-=views; save(); ui(); allAds.unshift({id:Date.now(),title:title,link:link,remaining:views,total_views:views,owner:myId,owner_name:'You',is_premium:false}); if(supa && !usingDemo){ try{ await supa.from('ads').insert([{title:title,link:link,total_views:views,remaining:views,owner:myId,owner_name:'User',is_premium:false}]); }catch(e){} } closeAdd(); renderAll(); }
+async function addPremium(){ let t=document.getElementById('premTitle').value.trim(); let l=document.getElementById('premLink').value.trim(); let v=parseInt(document.getElementById('premViews').value)||100; if(v<100){ alert('Premium MIN 100'); return; } if(!t||!l){ alert('Fill'); return; } if(balance<v){ alert('Balance bai isa - Buy Points!'); return; } balance-=v; save(); ui(); allAds.unshift({id:Date.now(),title:t,link:l,remaining:v,total_views:v,owner:myId,owner_name:'You 👑',is_premium:true}); if(supa && !usingDemo){ try{ await supa.from('ads').insert([{title:t,link:l,total_views:v,remaining:v,owner:myId,owner_name:'User 👑',is_premium:true}]); }catch(e){} } renderAll(); alert('Premium added! - Yana nan!'); }
+async function delTask(id){ if(!confirm('Delete?')) return; allAds=allAds.filter(a=>a.id!==id); if(supa){ try{ await supa.from('ads').delete().eq('id',id); }catch(e){} } renderAll(); }
+function buyPoints(points,stars){
+  let tg = window.Telegram ? window.Telegram.WebApp : null;
+  if(tg){ tg.ready(); tg.expand(); }
+  if(tg && tg.openInvoice){
+    tg.openInvoice({title: points+" Points", description: "Buy "+points+" Points - Iya wannan kadai ake biya - Tasks FREE. Payment to @realreferralAdsbot", payload: "buy_"+points+"_"+myId+"_"+Date.now(), currency: "XTR", prices: [{label: points+" Points", amount: stars}]}, function(status){
+      if(status=="paid"){ balance+=points; if(points>=2500) balance+=500; save(); ui(); alert('✅ PAID! '+points+' Points added! Kudin '+stars+'⭐ ya shiga @realreferralAdsbot - Tasks Premium Referral duk suna nan!'); } else { alert('Payment '+status); }
+    });
+  } else {
+    if(confirm('Test: Buy '+points+'P for '+stars+'⭐?')){ balance+=points; if(points>=2500) balance+=500; save(); ui(); alert('✅ Test: '+points+' added!'); }
+  }
+}
+function copyRef(){ let t=document.getElementById('ref').innerText; if(navigator.clipboard) navigator.clipboard.writeText(t).then(()=>alert('Copied! Invite page yana nan!')); }
+let savedBal=localStorage.getItem('balance_'+myId); if(savedBal) balance=parseInt(savedBal)||307;
+ui(); drawGate(); drawGroups(); drawMonet(); renderAll(); loadAll();
+if(window.Telegram && Telegram.WebApp){ Telegram.WebApp.ready(); Telegram.WebApp.expand(); }
+</script></body></html>

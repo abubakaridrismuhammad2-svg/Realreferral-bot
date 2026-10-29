@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>RealReferral V37</title>
+<style>
+html,body{margin:0;padding:0;background:#f1f5f9;font-family:Arial,sans-serif}
+.wrap{padding:12px;padding-bottom:120px;max-width:480px;margin:0 auto}
+.top{background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:14px;display:flex;justify-content:space-between;align-items:center}
+.badge{background:#0f172a;color:#fff;border-radius:99px;padding:6px 12px;font-weight:800;font-size:12px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:12px 0}
+.box{background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:12px;text-align:center}
+.box b{font-size:22px;display:block}
+.box span{font-size:9px;color:#64748b;font-weight:700}
+.card{background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:12px;margin-bottom:12px}
+.row{display:flex;justify-content:space-between;align-items:center;padding:10px;border:1px solid #e2e8f0;border-radius:12px;margin-bottom:8px;background:#fff;text-decoration:none;color:#0f172a}
+.btn{background:#0f172a;color:#fff;border:none;border-radius:99px;padding:10px 16px;font-weight:800;cursor:pointer}
+.nav{position:fixed;bottom:12px;left:12px;right:12px;background:#fff;border:1px solid #e2e8f0;border-radius:20px;display:flex;padding:6px;z-index:999}
+.nav div{flex:1;text-align:center;padding:8px;border-radius:14px;cursor:pointer;opacity:0.5;font-size:11px;font-weight:700}
+.nav div.active{opacity:1;background:#0f172a;color:#fff}
+.page{display:none}.page.active{display:block}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:none;align-items:center;justify-content:center;z-index:1000;padding:20px}
+.modal.active{display:flex}
+.circle{width:70px;height:70px;border:4px solid #0f172a;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:900;margin:12px auto;background:#fff}
+</style></head>
+<body><div class="wrap">
+<div class="top"><b>Dashboard</b><div style="display:flex;gap:6px"><div class="badge" id="balTop">292 Points</div><button class="btn" onclick="location.reload()">Refresh</button></div></div>
+<div id="p-home" class="page active">
+<div class="grid3">
+<div class="box"><span>GLOBAL CLICKS</span><b id="g">124</b><div>🌐</div></div>
+<div class="box"><span>CLICK BALANCE</span><b id="b">292</b><button class="btn" style="font-size:10px;margin-top:6px;padding:6px 12px" onclick="openAdd()">+ Add</button><div>💎</div></div>
+<div class="box"><span>CLICKS RECEIVED</span><b id="r">18</b><div>📥</div></div>
+</div>
+<div class="card"><b>Daily Rewards - 8 Tasks</b><div id="monetGrid"></div></div>
+<div style="font-size:10px;font-weight:800;color:#64748b;margin:8px 4px">FEATURED TASK - IN KA KALLA, YAWUCE, WANI YAZO</div>
+<div class="card" id="featWrap"></div>
+<div style="font-size:10px;font-weight:800;color:#64748b;margin:8px 4px">MY CAMPAIGNS - <span id="myCount">0/3</span></div>
+<div class="card" id="myWrap"><button class="btn" style="width:100%;padding:14px" onclick="openAdd()">+ Add your first task</button></div>
+</div>
+<div id="p-tasks" class="page"><div id="tasksList"></div></div>
+<div id="p-premium" class="page"><div class="card"><b>Premium Promotion</b><p style="margin:8px 0;font-size:11px">No premium yet</p></div></div>
+<div id="p-groups" class="page"><div class="card"><b>Community Groups</b><div style="margin-top:10px"><a class="row" href="https://t.me/+Rwe4riOGKPszMTI0" target="_blank"><span><b>Main Group</b><br><small>Join +5</small></span><span class="badge">+5</span></a><a class="row" href="https://t.me/+Eyd0Z_uqQGM5ZjI0" target="_blank"><span><b>Community Group</b><br><small>Join +5</small></span><span class="badge">+5</span></a></div></div></div>
+<div id="p-invite" class="page"><div class="card" style="text-align:center"><b>Invite & Earn 10%</b><div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:10px;margin:10px 0;font-size:11px;word-break:break-all" id="refLink">https://t.me/realreferralAdsbot?start=7741288581</div><button class="btn" style="width:100%" onclick="copyRef()">Copy Link</button></div></div>
+</div>
+<div class="nav"><div class="active" onclick="showPage('home',0)">🏠<br>Home</div><div onclick="showPage('tasks',1)">⚡<br>Tasks</div><div onclick="showPage('premium',2)">💎<br>Premium</div><div onclick="showPage('groups',3)">👥<br>Groups</div><div onclick="showPage('invite',4)">👤<br>Invite</div></div>
+<div id="timerModal" class="modal"><div class="card" style="width:100%;max-width:320px;text-align:center"><h2>Please wait 15s</h2><div class="circle" id="timerNum">15</div><button class="btn" id="claimBtn" style="display:none;width:100%;margin-top:12px;padding:14px" onclick="doClaim()">CLAIM +1 POINT</button></div></div>
+<div id="addModal" class="modal"><div class="card" style="width:100%;max-width:360px"><div style="display:flex;justify-content:space-between"><b>Add New Task</b><button onclick="closeAdd()" style="width:30px;height:30px;border:1px solid #e2e8f0;border-radius:8px;background:#fff">X</button></div><input id="inLink" placeholder="https://t.me/your_channel" style="width:100%;padding:12px;border:1px solid #e2e8f0;border-radius:10px;margin-top:12px"><input id="inTitle" placeholder="Title" value="t.me" style="width:100%;padding:12px;border:1px solid #e2e8f0;border-radius:10px;margin-top:8px"><div style="display:flex;gap:8px;margin-top:8px"><input id="inViews" type="number" value="20" style="flex:1;padding:12px;border:1px solid #e2e8f0;border-radius:10px;text-align:center;font-weight:800"><button class="btn" style="flex:1" onclick="doAdd()">Add Task</button></div><div id="costInfo" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:8px;margin-top:8px;font-size:12px;font-weight:700">Costs 20 Points</div></div></div>
+<script>
+var balance=292, gClicks=124, rClicks=18, cur=0, pend=null, busy=false;
+var ads=[
+{id:1,title:"Join Channel 1 - 20 views",link:"https://t.me/channel_demo1",left:20,total:20},
+{id:2,title:"Join Channel 2 - 15 views",link:"https://t.me/channel_demo2",left:15,total:20},
+{id:3,title:"Join Channel 3 - 50 views",link:"https://t.me/channel_demo3",left:50,total:50},
+{id:4,title:"Join Channel 4 - 10 views",link:"https://t.me/channel_demo4",left:10,total:10},
+{id:5,title:"Join Channel 5 - 30 views",link:"https://t.me/channel_demo5",left:30,total:30}
+];
+var monet=[
+"https://www.profitableratecpmnetwork.com/rg9frw0b?key=3a285a0baa1bd805086b878c9945749a",
+"https://www.profitableratecpmnetwork.com/jipcgnfd?key=79a72cee205f810d60114be4f4761dd1",
+"https://www.profitableratecpmnetwork.com/bmdtadg5pg?key=66bda5e5e2e88b4c29fffd6cc217a6ae",
+"https://www.profitableratecpmnetwork.com/kxibh57f73?key=af241f4ce58f6d75267ae7f41fe07ae2",
+"https://omg10.com/4/11920289","https://omg10.com/4/11920288","https://omg10.com/4/11920287","https://omg10.com/4/10943082"
+];
+function updateUI(){
+document.getElementById('b').innerHTML=balance;
+document.getElementById('balTop').innerHTML=balance+' Points';
+document.getElementById('g').innerHTML=gClicks;
+document.getElementById('r').innerHTML=rClicks;
+document.getElementById('myCount').innerHTML='0/3';
+}
+function drawMonet(){
+var el=document.getElementById('monetGrid'); var s='';
+for(var i=0;i<monet.length;i++){
+s+='<a class="row" href="'+monet[i]+'" target="_blank" onclick="openTimer(false)"><span><b>Task '+(i+1)+'</b><br><small>Reward +1</small></span><span class="badge">Open</span></a>';
+}
+el.innerHTML=s;
+}
+function drawFeat(){
+if(cur>=ads.length) cur=0;
+var a=ads[cur];
+var w=document.getElementById('featWrap');
+w.innerHTML='<div style="display:flex;justify-content:space-between;margin-bottom:8px"><b style="font-size:12px">'+a.title+' • '+(cur+1)+'/'+ads.length+'</b><span class="badge" style="font-size:10px">'+a.left+' left</span></div><div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:10px;display:flex;justify-content:space-between;align-items:center"><div style="flex:1"><div style="font-size:10px;color:#64748b">In ka kalla, yawuce, wani yazo</div><div style="font-size:11px;word-break:break-all;margin-top:4px;font-weight:700">'+a.link+'</div></div><button class="btn" onclick="openReal('+cur+')">Visit</button></div>';
+var list=document.getElementById('tasksList'); var html='';
+for(var i=0;i<ads.length;i++){
+html+='<div class="card"><div style="display:flex;justify-content:space-between"><b style="font-size:12px">'+ads[i].title+'</b><span class="badge" style="font-size:10px">'+ads[i].left+' left</span></div><div style="font-size:11px;word-break:break-all;margin:8px 0">'+ads[i].link+'</div><button class="btn" style="width:100%" onclick="openReal('+i+')">View Task</button></div>';
+}
+list.innerHTML=html;
+}
+function openReal(i){
+cur=i;
+var m=monet[Math.floor(Math.random()*monet.length)];
+pend={i:i,real:true};
+window.open(m,'_blank');
+openTimer(true);
+}
+function openTimer(isReal){
+var modal=document.getElementById('timerModal'); modal.classList.add('active');
+var btn=document.getElementById('claimBtn'); btn.style.display='none';
+var sec=15; var num=document.getElementById('timerNum'); num.innerHTML=sec;
+var iv=setInterval(function(){
+sec--; num.innerHTML=sec;
+if(sec<=0){ clearInterval(iv); btn.style.display='block'; }
+},1000);
+if(!isReal){ pend={real:false}; }
+}
+function doClaim(){
+if(busy) return; busy=true;
+document.getElementById('timerModal').classList.remove('active');
+balance+=1; gClicks+=1;
+if(pend && pend.real){
+ads[pend.i].left=Math.max(0,ads[pend.i].left-1);
+cur++;
+if(cur>=ads.length) cur=0;
+}
+pend=null;
+updateUI(); drawFeat();
+alert('✅ +1 Point! Balance: '+balance+' - Task ya wuce! Wani ya zo');
+busy=false;
+}
+function showPage(p,idx){
+var pages=document.querySelectorAll('.page'); for(var i=0;i<pages.length;i++) pages[i].classList.remove('active');
+document.getElementById('p-'+p).classList.add('active');
+var navs=document.querySelectorAll('.nav div'); for(var j=0;j<navs.length;j++) navs[j].classList.toggle('active',j===idx);
+window.scrollTo(0,0);
+}
+function openAdd(){ document.getElementById('addModal').classList.add('active'); }
+function closeAdd(){ document.getElementById('addModal').classList.remove('active'); }
+function doAdd(){
+var l=document.getElementById('inLink').value.trim();
+var t=document.getElementById('inTitle').value.trim()||'t.me';
+var v=parseInt(document.getElementById('inViews').value)||20;
+if(!l){ alert('Saka link'); return; }
+if(balance<v){ alert('Balance bai isa ba: '+balance); return; }
+balance-=v;
+ads.unshift({id:Date.now(),title:t,link:l,left:v,total:v});
+closeAdd(); updateUI(); drawFeat();
+alert('Task added!');
+}
+function copyRef(){
+var txt=document.getElementById('refLink').innerText;
+if(navigator.clipboard){ navigator.clipboard.writeText(txt).then(function(){ alert('Copied!'); }); } else { alert(txt); }
+}
+updateUI(); drawMonet(); drawFeat();
+</script></body></html>

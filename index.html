@@ -1,0 +1,127 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>V36 Ultra</title>
+<style>*{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}body{background:#F8FAFC;padding:12px;padding-bottom:110px}
+.top{display:flex;justify-content:space-between;align-items:center;background:#fff;border:1px solid #E2E8F0;border-radius:16px;padding:12px;margin-bottom:10px}
+.pill{background:#0F172A;color:#fff;border-radius:100px;padding:6px 12px;font-size:12px;font-weight:700}
+.stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px}
+.sc{background:#fff;border:1px solid #E2E8F0;border-radius:16px;padding:10px;text-align:center}
+.card{background:#fff;border:1px solid #E2E8F0;border-radius:16px;padding:12px;margin-bottom:10px}
+.btn{background:#0F172A;color:#fff;border:none;border-radius:100px;padding:8px 14px;font-weight:700;cursor:pointer}
+.page{display:none}.page.active{display:block}
+.nav{position:fixed;bottom:10px;left:10px;right:10px;background:#fff;border:1px solid #E2E8F0;border-radius:18px;display:flex;justify-content:space-around;padding:6px;box-shadow:0 8px 20px rgba(0,0,0,.1)}
+.nav div{flex:1;text-align:center;opacity:.5;padding:6px;border-radius:12px;cursor:pointer;font-size:10px}.nav div.active{opacity:1;background:#0F172A;color:#fff}
+.task{display:flex;justify-content:space-between;align-items:center;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:10px;margin-top:8px}
+.modal{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:999;padding:16px}.modal.active{display:flex}
+</style></head><body>
+<div class="top"><b>Dashboard</b><div style="display:flex;gap:6px"><div class="pill" id="balTop">292 Points</div><button class="btn" onclick="refreshAll()">Refresh</button></div></div>
+<div id="p-home" class="page active">
+<div class="stats"><div class="sc"><div style="font-size:18px">🌐</div><div style="font-size:9px;color:#64748B">GLOBAL CLICKS</div><b id="g" style="font-size:20px">0</b></div><div class="sc"><div style="font-size:18px">💎</div><div style="font-size:9px;color:#64748B">CLICK BALANCE</div><b id="b" style="font-size:20px">292</b><br><button class="btn" style="margin-top:6px;font-size:10px" onclick="openWiz()">+ Add</button></div><div class="sc"><div style="font-size:18px">📥</div><div style="font-size:9px;color:#64748B">CLICKS RECEIVED</div><b id="r" style="font-size:20px">0</b></div></div>
+<div class="card"><b style="font-size:13px">Daily Rewards - 8 Tasks</b><div id="monetGrid" style="margin-top:10px"></div><div style="text-align:center;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;padding:8px;margin-top:8px;font-size:11px;font-weight:600;color:#64748B">8 tasks available - Danna ka samu +1</div></div>
+<div style="font-size:10px;font-weight:700;color:#64748B;margin:14px 4px 6px">FEATURED TASK - IN KA KALLA, YAWUCE, WANI YAZO</div>
+<div id="currentTaskWrap" class="card" style="text-align:center"><b>Loading tasks...</b></div>
+<div style="font-size:10px;font-weight:700;color:#64748B;margin:14px 4px 6px">MY CAMPAIGNS - <span id="badge">0/3</span></div>
+<div id="myWrap"><div class="card"><button class="btn" style="width:100%;padding:12px" onclick="openWiz()">+ Add your first task</button></div></div>
+</div>
+<div id="p-tasks" class="page"><div id="tasksList"></div></div>
+<div id="p-premium" class="page"><div class="card" style="text-align:center">Premium - No campaigns yet</div></div>
+<div id="p-groups" class="page"><div class="card"><b>Groups</b><div style="margin-top:8px"><button class="btn" style="width:100%;margin-bottom:6px" onclick="joinG('Main')">Main Group +5</button><button class="btn" style="width:100%;margin-bottom:6px;background:#fff;color:#0F172A;border:1px solid #E2E8F0" onclick="joinG('VIP')">VIP Group +5</button></div></div></div>
+<div id="p-invite" class="page"><div class="card" style="text-align:center"><b>Invite & Earn</b><div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:10px;font-size:11px;margin:10px 0;word-break:break-all" id="ref">https://t.me/realreferralAdsbot?start=7741288581</div><button class="btn" onclick="navigator.clipboard.writeText(document.getElementById('ref').innerText);alert('Copied')">Copy Link</button></div></div>
+<div class="nav"><div class="active" onclick="showP('home',0)">🏠<br>Home</div><div onclick="showP('tasks',1)">⚡<br>Tasks</div><div onclick="showP('premium',2)">💎<br>Premium</div><div onclick="showP('groups',3)">👥<br>Groups</div><div onclick="showP('invite',4)">👤<br>Invite</div></div>
+<div id="timer" class="modal"><div class="card" style="width:100%;max-width:300px;text-align:center"><h3>Wait 15s</h3><div id="circle" style="width:60px;height:60px;border:3px solid #0F172A;border-radius:50%;margin:12px auto;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700">15</div><button class="btn" id="claimBtn" style="display:none;width:100%" onclick="claim()">Claim +1 Point</button></div></div>
+<div id="wiz" class="modal"><div class="card" style="width:100%;max-width:360px"><div style="display:flex;justify-content:space-between;margin-bottom:10px"><b>Add Task</b><button onclick="closeWiz()" style="border:1px solid #E2E8F0;background:#fff;border-radius:8px;width:28px;height:28px">x</button></div><input id="linkInput" placeholder="https://t.me/your_link" style="width:100%;padding:10px;border:1px solid #E2E8F0;border-radius:10px"><input id="titleInput" placeholder="Title t.me" value="t.me" style="width:100%;padding:10px;border:1px solid #E2E8F0;border-radius:10px;margin-top:8px"><div style="display:flex;gap:6px;margin-top:8px"><input id="viewsInput" type="number" value="20" style="flex:1;padding:10px;border:1px solid #E2E8F0;border-radius:10px;text-align:center;font-weight:700"><button class="btn" onclick="addTask()" style="flex:1">Add</button></div><div id="cost" style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;padding:8px;margin-top:8px;font-size:12px">Costs 20 Points</div></div></div>
+<script>
+var balance=292, globalClicks=45, received=5, currentIdx=0, pending=null, claiming=false;
+var tasks=[
+{id:1,title:"Demo Task 1 - t.me/channel1",link:"https://t.me/channel1",remain:20,total:20},
+{id:2,title:"Demo Task 2 - t.me/channel2",link:"https://t.me/channel2",remain:15,total:20},
+{id:3,title:"Demo Task 3 - t.me/channel3",link:"https://t.me/channel3",remain:50,total:50},
+{id:4,title:"Demo Task 4 - t.me/channel4",link:"https://t.me/channel4",remain:10,total:10}
+];
+var monetLinks=[
+"https://www.profitableratecpmnetwork.com/rg9frw0b?key=3a285a0baa1bd805086b878c9945749a",
+"https://www.profitableratecpmnetwork.com/jipcgnfd?key=79a72cee205f810d60114be4f4761dd1",
+"https://www.profitableratecpmnetwork.com/bmdtadg5pg?key=66bda5e5e2e88b4c29fffd6cc217a6ae",
+"https://www.profitableratecpmnetwork.com/kxibh57f73?key=af241f4ce58f6d75267ae7f41fe07ae2",
+"https://omg10.com/4/11920289","https://omg10.com/4/11920288","https://omg10.com/4/11920287","https://omg10.com/4/10943082"
+];
+var myTasks=[];
+function saveUI(){
+document.getElementById('b').innerText=balance;
+document.getElementById('balTop').innerText=balance+' Points';
+document.getElementById('g').innerText=globalClicks;
+document.getElementById('r').innerText=received;
+document.getElementById('badge').innerText=myTasks.length+'/3';
+var c=document.getElementById('viewsInput');
+if(c){ document.getElementById('cost').innerText='Costs '+(c.value||20)+' Points'; }
+}
+function renderMonet(){
+var g=document.getElementById('monetGrid'); if(!g) return;
+var h='';
+for(var i=0;i<monetLinks.length;i++){
+h+='<a href="'+monetLinks[i]+'" target="_blank" onclick="startTimer(); setTimeout(function(){pending={isReal:false}},200)" style="display:flex;justify-content:space-between;align-items:center;border:1px solid #E2E8F0;border-radius:10px;padding:10px;margin-bottom:6px;text-decoration:none;color:#0F172A;background:#fff"><span><b style="font-size:12px">Task '+(i+1)+'</b><br><small style="color:#64748B">Reward +1</small></span><span style="background:#0F172A;color:#fff;padding:4px 10px;border-radius:100px;font-size:10px">Open</span></a>';
+}
+g.innerHTML=h;
+}
+function renderFeatured(){
+var w=document.getElementById('currentTaskWrap'); if(!w) return;
+if(currentIdx>=tasks.length) currentIdx=0;
+var t=tasks[currentIdx];
+w.innerHTML='<div style="text-align:left"><div style="display:flex;justify-content:space-between;margin-bottom:6px"><b style="font-size:12px">'+t.title+' • '+(currentIdx+1)+'/'+tasks.length+'</b><span style="background:#0F172A;color:#fff;border-radius:100px;padding:3px 8px;font-size:10px">'+t.remain+' left</span></div><div class="task"><div style="flex:1"><small style="color:#64748B;font-size:10px">In ka kalla, yawuce, wani yazo</small><br><small style="font-size:11px;word-break:break-all">'+t.link+'</small></div><button class="btn" onclick="openTask('+currentIdx+')">Visit</button></div></div>';
+var list=document.getElementById('tasksList');
+if(list){
+var lh='';
+for(var i=0;i<tasks.length;i++){
+lh+='<div class="card" style="display:flex;justify-content:space-between;align-items:center"><div><b style="font-size:12px">'+tasks[i].title+'</b><br><small style="font-size:10px;word-break:break-all">'+tasks[i].link+'</small><br><small style="font-size:10px">'+tasks[i].remain+' left</small></div><button class="btn" style="margin-left:8px" onclick="openTask('+i+')">View</button></div>';
+}
+list.innerHTML=lh;
+}
+}
+function openTask(i){
+currentIdx=i;
+var monet=monetLinks[Math.floor(Math.random()*monetLinks.length)];
+pending={idx:i,isReal:true,monet:monet};
+window.open(monet,'_blank');
+startTimer();
+}
+function startTimer(){
+var m=document.getElementById('timer'); m.classList.add('active');
+var btn=document.getElementById('claimBtn'); btn.style.display='none';
+var sec=15; var circ=document.getElementById('circle'); circ.innerText=sec;
+var it=setInterval(function(){
+sec--; circ.innerText=sec;
+if(sec<=0){ clearInterval(it); btn.style.display='block'; }
+},1000);
+}
+function claim(){
+if(claiming) return; claiming=true;
+var m=document.getElementById('timer'); m.classList.remove('active');
+balance+=1; globalClicks+=1;
+if(pending && pending.isReal){
+tasks[pending.idx].remain=Math.max(0,tasks[pending.idx].remain-1);
+currentIdx++;
+if(currentIdx>=tasks.length) currentIdx=0;
+}
+pending=null;
+saveUI(); renderFeatured();
+alert('✅ +1 Point! Balance: '+balance+' - Yawuce! Wani ya zo');
+claiming=false;
+}
+function showP(p,i){
+var pages=document.querySelectorAll('.page'); for(var j=0;j<pages.length;j++) pages[j].classList.remove('active');
+document.getElementById('p-'+p).classList.add('active');
+var navs=document.querySelectorAll('.nav div'); for(var k=0;k<navs.length;k++) navs[k].classList.toggle('active',k===i);
+}
+function openWiz(){ document.getElementById('wiz').classList.add('active'); }
+function closeWiz(){ document.getElementById('wiz').classList.remove('active'); }
+function addTask(){
+var l=document.getElementById('linkInput').value.trim();
+var t=document.getElementById('titleInput').value.trim()||'t.me';
+var v=parseInt(document.getElementById('viewsInput').value)||20;
+if(!l){ alert('Saka link'); return; }
+if(balance<v){ alert('Not enough - Balance: '+balance); return; }
+balance-=v; myTasks.push({link:l,title:t,remain:v,total:v});
+saveUI(); closeWiz(); alert('Task added!'); document.getElementById('linkInput').value='';
+}
+function joinG(name){ balance+=5; saveUI(); alert('✅ +5 Points for '+name); }
+function refreshAll(){ saveUI(); renderMonet(); renderFeatured(); }
+saveUI(); renderMonet(); renderFeatured();
+</script></body></html>

@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>RealReferral - Professional Task Exchange</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7/dist/umd/supabase.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F8FAFC;--card:#FFFFFF;--border:#E2E8F0;--text:#0F172A;--muted:#64748B;--green:#16A34A;--green-bg:#F0FDF4;--gold:#FACC15;--gold-bg:#FFFBEB;--dark:#0F172A}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',system-ui,sans-serif}
+body{background:var(--bg);color:var(--text);padding:12px;padding-bottom:120px;line-height:1.5;-webkit-font-smoothing:antialiased}
+.header{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.9);backdrop-filter:blur(12px);border:1px solid var(--border);border-radius:20px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.logo{display:flex;align-items:center;gap:8px;font-weight:800;font-size:15px;letter-spacing:-.3px}
+.logo span{width:32px;height:32px;background:var(--dark);color:#fff;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px}
+.badge{background:var(--dark);color:#fff;border-radius:99px;padding:7px 14px;font-weight:700;font-size:12px;letter-spacing:.2px}
+.stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:14px 0}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:14px;text-align:center;box-shadow:0 1px 2px rgba(0,0,0,.03)}
+.stat .label{font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.8px;text-transform:uppercase}
+.stat .value{font-size:20px;font-weight:800;margin-top:4px;letter-spacing:-.5px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:16px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.card-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.card-title{font-size:13px;font-weight:700;letter-spacing:-.2px;display:flex;align-items:center;gap:6px}
+.btn{border:none;border-radius:99px;padding:10px 18px;font-weight:600;font-size:12.5px;cursor:pointer;transition:.15s;letter-spacing:.1px}
+.btn:active{transform:scale(.97)}
+.btn-dark{background:var(--dark);color:#fff}
+.btn-green{background:var(--green);color:#fff}
+.btn-gold{background:var(--gold);color:var(--dark);font-weight:700}
+.btn-outline{background:#fff;border:1px solid var(--border);color:var(--text)}
+.btn-small{padding:7px 14px;font-size:11.5px}
+.task-item{display:flex;justify-content:space-between;align-items:center;padding:14px;border:1px solid var(--border);border-radius:14px;margin-bottom:8px;background:#fff;transition:.15s}
+.task-item:hover{border-color:var(--text)}
+.task-item.free{border-color:#BBF7D0;background:var(--green-bg)}
+.task-title{font-size:13px;font-weight:600;letter-spacing:-.2px}
+.task-meta{font-size:11px;color:var(--muted);margin-top:2px}
+.buy-section{background:var(--gold-bg);border:1.5px solid var(--gold);border-radius:20px;padding:18px;margin:14px 0}
+.buy-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:14px}
+.my-header{background:var(--dark);color:#fff;border-radius:18px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;margin:16px 0 10px}
+.my-card{background:var(--green-bg);border:1.5px solid var(--green);border-radius:18px;padding:16px;margin-bottom:10px}
+.page{display:none;animation:fade .2s}.page.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.nav{position:fixed;bottom:12px;left:12px;right:12px;background:rgba(255,255,255,.95);backdrop-filter:blur(16px);border:1px solid var(--border);border-radius:22px;display:flex;padding:6px;z-index:99;box-shadow:0 10px 30px rgba(0,0,0,.1)}
+.nav-item{flex:1;text-align:center;padding:10px 4px;border-radius:16px;cursor:pointer;opacity:.55;transition:.15s}
+.nav-item.active{opacity:1;background:var(--dark);color:#fff;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.nav-item .icon{font-size:16px;display:block}.nav-item .label{font-size:9.5px;font-weight:700;margin-top:2px;letter-spacing:.3px;text-transform:uppercase}
+.modal{position:fixed;inset:0;background:rgba(15,23,42,.6);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:1000;padding:20px}.modal.active{display:flex}
+.modal-card{background:#fff;border-radius:24px;padding:22px;width:100%;max-width:360px;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+.input{width:100%;padding:12px 14px;border:1px solid var(--border);border-radius:12px;font-size:13.5px;outline:none;transition:.15s;background:#fff}
+.input:focus{border-color:var(--dark);box-shadow:0 0 0 3px rgba(15,23,42,.08)}
+.gate{position:fixed;inset:0;background:var(--bg);z-index:2000;display:none;flex-direction:column;padding:16px}.gate.active{display:flex}
+.pro-pill{background:var(--dark);color:#fff;border-radius:99px;padding:4px 10px;font-size:10px;font-weight:700;letter-spacing:.5px}
+.premium-card{border:1.5px solid var(--gold);background:var(--gold-bg)}
+</style></head><body>
+<div id="gateJoin" class="gate">
+<div style="text-align:center;padding:32px 0 20px"><div class="logo" style="justify-content:center;font-size:18px"><span>R</span> RealReferral Pro</div><p style="color:var(--muted);font-size:13px;margin-top:8px">Join 3 official groups to unlock platform</p><p style="font-weight:700;margin-top:4px">+15 Points Bonus</p></div>
+<div id="gateList"></div>
+<div style="margin-top:auto;background:var(--dark);color:#fff;border-radius:20px;padding:16px;text-align:center"><b id="gateProgress" style="font-size:18px">0/3 Joined</b><button id="gateBtn" class="btn" style="background:#fff;color:#000;width:100%;margin-top:12px;padding:14px;font-weight:700" onclick="checkGate()" disabled>Complete Joining to Continue</button></div>
+</div>
+
+<div class="header">
+<div class="logo"><span>R</span> RealReferral PRO</div>
+<div style="display:flex;gap:8px;align-items:center"><div class="badge" id="balTop">307 Points</div><button class="btn btn-outline btn-small" onclick="loadAll()">↻ Refresh</button></div>
+</div>
+
+<div id="p-home" class="page active">
+<div class="stats">
+<div class="stat"><div class="label">Global Clicks</div><div class="value" id="g">0</div></div>
+<div class="stat"><div class="label">Your Balance</div><div class="value" id="b" style="color:var(--green)">307</div><div style="font-size:10px;color:var(--green);font-weight:700;margin-top:2px">FREE TASKS ✅</div></div>
+<div class="stat"><div class="label">Received</div><div class="value" id="r">0</div></div>
+</div>
+
+<div class="card">
+<div class="card-head"><div class="card-title">⚡ Daily Rewards - 8 Tasks Available</div><div class="pro-pill">FREE</div></div>
+<p style="font-size:12px;color:var(--muted);margin-bottom:12px">Complete tasks powered by Monetag & Adsterra. Earn +1 point per task. No purchase required.</p>
+<div id="monetGrid"></div>
+</div>
+
+<div class="buy-section">
+<div style="display:flex;justify-content:space-between;align-items:center"><div><div style="font-weight:800;font-size:14px;letter-spacing:-.3px">💎 Buy Points with Telegram Stars</div><div style="font-size:11.5px;color:#92400E;margin-top:2px">The only paid feature. All tasks are 100% free.</div></div><div class="pro-pill" style="background:var(--gold);color:#000">PRO</div></div>
+<div class="buy-grid">
+<button class="btn btn-outline" onclick="buyPoints(100,1)" style="padding:12px"><b>100 Points</b><br><small>1 ⭐</small></button>
+<button class="btn btn-outline" onclick="buyPoints(500,5)" style="padding:12px"><b>500 Points</b><br><small>5 ⭐</small></button>
+<button class="btn btn-gold" onclick="buyPoints(2500,15)" style="padding:12px"><b>2500 +500</b><br><small>15 ⭐ BONUS</small></button>
+</div>
+</div>
+
+<div style="margin:16px 4px 8px;display:flex;justify-content:space-between;align-items:center"><span style="font-size:11px;font-weight:800;letter-spacing:.8px;color:var(--muted);text-transform:uppercase">Featured Task - Free Rotation</span><span id="featCount" style="font-size:10px;background:var(--border);padding:3px 8px;border-radius:99px;font-weight:700">1/3</span></div>
+<div id="featWrap" class="card"></div>
+
+<div class="my-header"><div><div style="font-weight:800;font-size:13px;letter-spacing:-.2px">MY CAMPAIGNS - <span id="myBadge">0/3</span></div><div style="font-size:11px;opacity:.7;margin-top:2px">Your active campaigns - Never expire - Stored locally + cloud</div></div><button class="btn btn-green btn-small" onclick="openAdd()">+ Add New</button></div>
+<div id="myWrap"></div>
+</div>
+
+<div id="p-tasks" class="page">
+<div class="card" style="background:var(--dark);color:#fff;border:none"><div style="display:flex;justify-content:space-between;align-items:center"><b>⚡ All Tasks - Free Exchange</b><span class="pro-pill" style="background:#fff;color:#000">LIVE</span></div><p style="font-size:12px;opacity:.7;margin-top:6px">Browse and complete tasks to earn points. All free.</p></div>
+<div id="tasksList"></div>
+</div>
+
+<div id="p-premium" class="page">
+<div class="card" style="background:var(--dark);color:#fff;border:none"><div style="display:flex;justify-content:space-between"><b>💎 Premium Campaigns - Pinned Placement</b><span style="background:var(--gold);color:#000;border-radius:99px;padding:4px 10px;font-size:10px;font-weight:800">GOLD</span></div><p style="font-size:11px;opacity:.7;margin:8px 0 12px">100 Points minimum. Your ad stays on top with gold highlight.</p><input id="premTitle" class="input" placeholder="Premium Campaign Title" style="margin-bottom:8px;background:#1E293B;color:#fff;border-color:#334155"><div style="display:flex;gap:8px"><input id="premLink" class="input" placeholder="https://t.me/yourchannel" style="flex:1;background:#1E293B;color:#fff;border-color:#334155"><button class="btn" style="background:#334155;color:#fff" onclick="navigator.clipboard.readText().then(t=>document.getElementById('premLink').value=t)">Paste</button></div><div style="display:flex;gap:8px;margin-top:10px"><input id="premViews" type="number" value="100" class="input" style="flex:1;background:#1E293B;color:#fff;border-color:#334155;text-align:center;font-weight:700"><button class="btn btn-gold" style="flex:1.4;padding:14px" onclick="addPremium()">Publish Premium - 100P</button></div></div>
+<div id="premList"></div>
+</div>
+
+<div id="p-groups" class="page"><div class="card"><div class="card-head"><div class="card-title">👥 Official Groups - Join to Earn</div></div><div id="groupsList"></div></div></div>
+
+<div id="p-invite" class="page">
+<div class="card" style="background:var(--dark);color:#fff;border:none;text-align:center"><div style="font-weight:800;font-size:14px">👤 Referral Program - Professional</div><div style="font-size:12px;opacity:.7;margin:6px 0 12px">Earn 20% commission + 10 Points per invite</div><div style="background:#1E293B;border-radius:12px;padding:12px;font-size:11px;word-break:break-all;font-family:monospace" id="ref">https://t.me/realreferralAdsbot?start=7741288581</div><button class="btn" style="background:#fff;color:#000;width:100%;margin-top:12px;padding:14px;font-weight:700" onclick="copyRef()">Copy Invite Link</button></div>
+<div class="card"><div class="card-head"><div class="card-title">Recent Referrals</div></div><div id="refList"></div></div>
+</div>
+
+<div class="nav">
+<div class="nav-item active" onclick="showP('home',0)"><span class="icon">🏠</span><span class="label">Home</span></div>
+<div class="nav-item" onclick="showP('tasks',1)"><span class="icon">⚡</span><span class="label">Tasks</span></div>
+<div class="nav-item" onclick="showP('premium',2)"><span class="icon">💎</span><span class="label">Premium</span></div>
+<div class="nav-item" onclick="showP('groups',3)"><span class="icon">👥</span><span class="label">Groups</span></div>
+<div class="nav-item" onclick="showP('invite',4)"><span class="icon">👤</span><span class="label">Invite</span></div>
+</div>
+
+<div id="timer" class="modal"><div class="modal-card" style="text-align:center"><h3 style="font-size:16px;letter-spacing:-.3px">Completing Task</h3><p style="font-size:12px;color:var(--muted);margin:6px 0 12px">Please wait 15 seconds - Verification in progress</p><div style="width:72px;height:72px;border:3px solid var(--dark);border-top-color:transparent;border-radius:50%;margin:16px auto;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:22px;animation:spin 1s linear infinite" id="tNum">15</div><style>@keyframes spin{to{transform:rotate(360deg)}}</style><button class="btn btn-green" id="claimBtn" style="display:none;width:100%;padding:15px;font-size:14px;font-weight:700" onclick="doClaim()">Claim +1 Point</button></div></div>
+
+<div id="addModal" class="modal"><div class="modal-card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><b style="font-size:15px">Create New Campaign</b><button onclick="closeAdd()" style="width:32px;height:32px;border-radius:10px;border:1px solid var(--border);background:#fff;font-weight:700">✕</button></div><label style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px">Destination Link</label><input id="inLink" placeholder="https://t.me/yourchannel" class="input" style="margin:6px 0 12px"><label style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px">Campaign Title</label><input id="inTitle" placeholder="e.g. My Telegram Channel" class="input" style="margin:6px 0 12px"><label style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px">Views Required (Min 50)</label><div style="display:flex;gap:10px;margin-top:6px"><input id="inViews" type="number" value="50" class="input" style="flex:1;text-align:center;font-weight:800;font-size:16px"><button class="btn btn-dark" style="flex:1.2;padding:14px;font-weight:700" onclick="addReal()">Launch Campaign</button></div><p style="font-size:11px;color:var(--green);font-weight:600;margin-top:12px;text-align:center">✓ Stored locally + cloud - Never disappears</p></div></div>
+
+<script>
+const SUP_URL="https://hgdxkzzgzmiropkrdfhm.supabase.co";
+const SUP_KEY="sb_publishable_8jJGMNp-44jHaeJfe2MwNw_yv9x100O";
+let supa=null; try{ supa=supabase.createClient(SUP_URL,SUP_KEY);}catch(e){}
+let myId=7741288581; if(window.Telegram?.WebApp?.initDataUnsafe?.user){ myId=Telegram.WebApp.initDataUnsafe.user.id; }
+let balance=parseInt(localStorage.getItem('balance_'+myId)||localStorage.getItem('balance')||'307'), gClicks=0, rClicks=0, cur=0, pend=null, allAds=[];
+let joinedGroups=JSON.parse(localStorage.getItem('joinedGroups_'+myId)||'[]');
+let mySavedTasks=[]; for(let k of ['myTasks_'+myId,'myTasks_7741288581','myTasks']){ try{ let v=JSON.parse(localStorage.getItem(k)||'[]'); if(v.length>mySavedTasks.length) mySavedTasks=v; }catch(e){} }
+if(mySavedTasks.length==0){ mySavedTasks=[{id:Date.now(),title:"My First Professional Campaign",link:"https://t.me/realreferralAdsbot",remaining:50,total_views:50,owner:myId,owner_name:"You",is_premium:false}]; }
+let groups=[{id:'main',name:'Main Community',link:'https://t.me/+Rwe4riOGKPszMTI0',members:'12.4K'},{id:'community',name:'Growth Hub',link:'https://t.me/+Eyd0Z_uqQGM5ZjI0',members:'8.2K'},{id:'vip',name:'VIP Professionals',link:'https://t.me/+OFwjUl2v-L44OTRk',members:'3.1K'}];
+let monet=["https://www.profitableratecpmnetwork.com/rg9frw0b?key=3a285a0baa1bd805086b878c9945749a","https://www.profitableratecpmnetwork.com/jipcgnfd?key=79a72cee205f810d60114be4f4761dd1","https://www.profitableratecpmnetwork.com/bmdtadg5pg?key=66bda5e5e2e88b4c29fffd6cc217a6ae","https://www.profitableratecpmnetwork.com/kxibh57f73?key=af241f4ce58f6d75267ae7f41fe07ae2","https://omg10.com/4/11920289","https://omg10.com/4/11920288","https://omg10.com/4/11920287","https://omg10.com/4/10943082"];
+let demoAds=[{id:1001,title:"Professional Crypto Signals - Premium Analysis",link:"https://t.me/demo_crypto",remaining:85,total_views:100,owner:999,is_premium:false},{id:1002,title:"Telegram Growth Mastery - 10K Members",link:"https://t.me/demo_growth",remaining:42,total_views:80,owner:998,is_premium:false},{id:1003,title:"VIP Trading Signals - Gold Package",link:"https://t.me/demo_vip",remaining:95,total_views:100,owner:997,is_premium:true}];
+function save(){ localStorage.setItem('joinedGroups_'+myId,JSON.stringify(joinedGroups)); localStorage.setItem('balance_'+myId,balance); localStorage.setItem('myTasks_'+myId,JSON.stringify(mySavedTasks)); localStorage.setItem('myTasks_7741288581',JSON.stringify(mySavedTasks)); localStorage.setItem('balance',balance); }
+function ui(){ document.getElementById('b').innerText=balance; document.getElementById('balTop').innerText=balance+' Points'; document.getElementById('g').innerText=gClicks; document.getElementById('r').innerText=rClicks; }
+function drawGate(){ let el=document.getElementById('gateList'); el.innerHTML=groups.map(g=>{ let jo=joinedGroups.includes(g.id); return `<div class="task-item" style="${jo?'border-color:#16A34A;background:#F0FDF4':''}"><div><div class="task-title">${g.name} ${jo?'✓':''}</div><div class="task-meta">${g.members} members • Official</div></div><a href="${g.link}" target="_blank" onclick="joinGroup('${g.id}')" class="btn ${jo?'btn-green':'btn-dark'} btn-small" style="text-decoration:none">${jo?'Joined':'Join Group'}</a></div>`; }).join(''); document.getElementById('gateProgress').innerText=joinedGroups.length+'/3 Groups Joined'; let btn=document.getElementById('gateBtn'); if(joinedGroups.length>=3){ btn.disabled=false; btn.innerText='Continue to Dashboard →'; } else { btn.disabled=true; btn.innerText='Join All 3 Groups to Continue ('+joinedGroups.length+'/3)'; } document.getElementById('gateJoin').classList.toggle('active',joinedGroups.length<3); }
+function joinGroup(id){ if(!joinedGroups.includes(id)){ joinedGroups.push(id); balance+=5; save(); ui(); drawGate(); drawGroups(); } }
+function checkGate(){ if(joinedGroups.length>=3) document.getElementById('gateJoin').classList.remove('active'); }
+function drawGroups(){ let el=document.getElementById('groupsList'); if(!el) return; el.innerHTML=groups.map(g=>{ let jo=joinedGroups.includes(g.id); return `<div class="task-item"><div><div class="task-title">${g.name}</div><div class="task-meta">${g.members} members</div></div>${jo?'<span class="badge" style="background:#16A34A">+5 Joined</span>':`<a href="${g.link}" target="_blank" onclick="joinGroup('${g.id}')" class="btn btn-dark btn-small" style="text-decoration:none">Join +5</a>`}</div>`; }).join(''); }
+function drawMonet(){ document.getElementById('monetGrid').innerHTML=monet.map((m,i)=>`<a href="${m}" target="_blank" onclick="openTimer()" class="task-item free"><div><div class="task-title">Daily Task ${i+1} - Sponsored Reward</div><div class="task-meta">Monetag / Adsterra Network • +1 Point • No purchase</div></div><span class="badge" style="background:#16A34A">Open</span></a>`).join(''); }
+function renderAll(){
+let list=allAds.length?allAds:demoAds.concat(mySavedTasks);
+let avail=list.filter(a=>a.remaining>0 && String(a.owner)!==String(myId));
+if(avail.length==0) avail=demoAds;
+let feat=document.getElementById('featWrap'); if(cur>=avail.length) cur=0; let a=avail[cur];
+document.getElementById('featCount').innerText=(cur+1)+'/'+avail.length;
+feat.innerHTML=`<div class="${a.is_premium?'premium-card':''}" style="border-radius:14px;padding:4px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><div style="display:flex;gap:6px;align-items:center"><b class="task-title">${a.is_premium?'👑 ':''}${a.title}</b>${a.is_premium?'<span class="pro-pill" style="background:#FACC15;color:#000">PREMIUM</span>':''}</div><span class="badge" style="background:#F1F5F9;color:#0F172A;font-size:10px">${a.remaining}/${a.total_views}</span></div><div style="background:#F8FAFC;border:1px solid var(--border);border-radius:12px;padding:12px;display:flex;justify-content:space-between;align-items:center;gap:10px"><code style="font-size:11px;word-break:break-all;background:#fff;padding:8px;border-radius:8px;border:1px solid var(--border);flex:1">${a.link}</code><button class="btn btn-green" onclick="viewTask(${a.id})">Visit Free</button></div></div>`;
+document.getElementById('tasksList').innerHTML=avail.filter(x=>!x.is_premium).map(x=>`<div class="task-item"><div><div class="task-title">${x.title}</div><div class="task-meta">${x.remaining} views left • Free task</div></div><button class="btn btn-green btn-small" onclick="viewTask(${x.id})">View</button></div>`).join('')+`<div class="card" style="text-align:center;border-style:dashed"><b style="font-size:13px">All Tasks Page - Professional</b><p style="font-size:11px;color:var(--muted);margin:6px 0">All free tasks available here</p><button class="btn btn-dark" style="width:100%;margin-top:8px;padding:12px" onclick="openAdd()">+ Create New Campaign</button></div>`;
+document.getElementById('premList').innerHTML=list.filter(x=>x.is_premium).map(x=>`<div class="card premium-card"><div style="display:flex;justify-content:space-between"><b class="task-title">👑 ${x.title}</b><span class="pro-pill" style="background:#FACC15;color:#000">PREMIUM</span></div><code style="display:block;font-size:11px;margin:10px 0;word-break:break-all;background:#fff;padding:10px;border-radius:10px;border:1px solid #FDE68A">${x.link}</code><div style="display:flex;justify-content:space-between;align-items:center"><small style="font-weight:600">${x.remaining}/${x.total_views} remaining</small><button class="btn btn-gold btn-small" onclick="viewTask(${x.id})">Visit Premium</button></div></div>`).join('') || `<div class="card" style="text-align:center">No premium campaigns yet</div>`;
+document.getElementById('myBadge').innerText=mySavedTasks.length+'/3';
+document.getElementById('myWrap').innerHTML=mySavedTasks.map(x=>`<div class="my-card"><div style="display:flex;justify-content:space-between;align-items:center"><div style="display:flex;gap:8px;align-items:center"><b class="task-title">✓ ${x.title}</b><span class="pro-pill" style="background:#16A34A">ACTIVE</span></div><button onclick="delTask(${x.id})" style="background:#FEF2F2;color:#DC2626;border:1px solid #FECACA;border-radius:8px;padding:6px 12px;font-size:11px;font-weight:700">Delete</button></div><code style="display:block;font-size:12px;margin:10px 0;word-break:break-all;background:#fff;padding:10px;border-radius:10px;border:1px solid #BBF7D0;font-weight:600">${x.link}</code><div style="display:flex;justify-content:space-between"><small style="font-weight:700;color:#16A34A">${x.remaining}/${x.total_views} views remaining - Active</small><small style="color:var(--muted)">${x.total_views-x.remaining} delivered</small></div></div>`).join('')+`<div class="card" style="text-align:center;border:1.5px dashed #16A34A;background:#F0FDF4"><b style="font-size:13px">✓ My Campaigns - Professional Storage</b><p style="font-size:11px;color:var(--muted);margin:6px 0">Never disappears - Stored locally + cloud backup</p><button class="btn btn-green" style="width:100%;margin-top:8px;padding:12px" onclick="openAdd()">+ Launch New Campaign</button></div>`;
+document.getElementById('refList').innerHTML=`<div class="task-item"><div><div class="task-title">Professional User #4821</div><div class="task-meta">Joined 2 hours ago</div></div><span class="badge" style="background:#16A34A">+10 Points</span></div><div class="task-item"><div><div class="task-title">Professional User #4820</div><div class="task-meta">Joined yesterday</div></div><span class="badge" style="background:#16A34A">+10 Points</span></div>`;
+}
+async function loadAll(){ try{ if(supa){ let {data}=await supa.from('ads').select('*').order('created_at',{ascending:false}).limit(200); if(data?.length) allAds=data; else allAds=mySavedTasks.concat(demoAds); } else allAds=mySavedTasks.concat(demoAds); gClicks=allAds.reduce((s,a)=>s+((a.total_views||0)-(a.remaining||0)),0)+50; rClicks=mySavedTasks.reduce((s,a)=>s+((a.total_views||0)-(a.remaining||0)),0); ui(); drawMonet(); renderAll(); drawGroups(); }catch(e){ allAds=mySavedTasks.concat(demoAds); ui(); drawMonet(); renderAll(); drawGroups(); } }
+let rot=0; function viewTask(id){ let ad=(allAds.length?allAds:demoAds.concat(mySavedTasks)).find(a=>a.id===id); if(!ad) return; let m=monet[rot%monet.length]; rot++; pend={id:id}; window.open(m,'_blank'); openTimer(); }
+function openTimer(){ let modal=document.getElementById('timer'); modal.classList.add('active'); let btn=document.getElementById('claimBtn'); btn.style.display='none'; let sec=15; let el=document.getElementById('tNum'); el.innerText=sec; let iv=setInterval(()=>{ sec--; el.innerText=sec; if(sec<=0){ clearInterval(iv); btn.style.display='block'; el.style.animation='none'; } },1000); }
+async function doClaim(){ document.getElementById('timer').classList.remove('active'); balance+=1; save(); ui(); alert('✓ Success! +1 Point Added. New Balance: '+balance); pend=null; await loadAll(); }
+function showP(p,i){ document.querySelectorAll('.page').forEach(el=>el.classList.remove('active')); document.getElementById('p-'+p).classList.add('active'); document.querySelectorAll('.nav-item').forEach((el,idx)=>el.classList.toggle('active',idx===i)); loadAll(); window.scrollTo(0,0); }
+function openAdd(){ document.getElementById('addModal').classList.add('active'); } function closeAdd(){ document.getElementById('addModal').classList.remove('active'); }
+async function addReal(){ let link=document.getElementById('inLink').value.trim(); let title=document.getElementById('inTitle').value.trim()||'Professional Campaign'; let views=parseInt(document.getElementById('inViews').value)||50; if(views<50){ alert('Minimum 50 views required for professional campaign'); return; } if(!link){ alert('Please enter destination link'); return; } if(!link.startsWith('http')){ alert('Link must start with https://'); return; } if(balance<views){ alert('Insufficient balance: '+balance+' points. Complete free tasks or buy points.'); return; } balance-=views; let nt={id:Date.now(),title:title,link:link,remaining:views,total_views:views,owner:myId,owner_name:'You - Pro',is_premium:false}; mySavedTasks.unshift(nt); allAds.unshift(nt); save(); ui(); closeAdd(); renderAll(); if(supa){ try{ await supa.from('ads').insert([{title:title,link:link,total_views:views,remaining:views,owner:myId,owner_name:'Professional User',is_premium:false}]); }catch(e){} } alert('✓ Professional Campaign Launched! Active in My Campaigns. Never disappears.'); }
+async function addPremium(){ let t=document.getElementById('premTitle').value.trim(); let l=document.getElementById('premLink').value.trim(); if(!t||!l){ alert('Please fill title and link'); return; } let v=parseInt(document.getElementById('premViews').value)||100; if(v<100){ alert('Premium minimum is 100 views'); return; } if(balance<v){ alert('Insufficient balance'); return; } balance-=v; let nt={id:Date.now(),title:t,link:l,remaining:v,total_views:v,owner:myId,owner_name:'You - Pro Premium',is_premium:true}; mySavedTasks.unshift(nt); allAds.unshift(nt); save(); ui(); renderAll(); if(supa){ try{ await supa.from('ads').insert([{title:t,link:l,total_views:v,remaining:v,owner:myId,owner_name:'Professional Premium',is_premium:true}]); }catch(e){} } alert('✓ Premium Campaign Launched! Gold placement active.'); }
+async function delTask(id){ if(!confirm('Delete this professional campaign permanently?')) return; mySavedTasks=mySavedTasks.filter(a=>a.id!==id); allAds=allAds.filter(a=>a.id!==id); save(); renderAll(); if(supa){ try{ await supa.from('ads').delete().eq('id',id); }catch(e){} } }
+function buyPoints(points,stars){ let tg=window.Telegram?.WebApp; if(tg){ tg.ready(); tg.expand(); } if(tg?.openInvoice){ tg.openInvoice({title: points+" Points - Professional Package", description: "Professional points package - Only paid feature. All tasks are free. Payment to @realreferralAdsbot", payload: "pro_buy_"+points+"_"+myId+"_"+Date.now(), currency: "XTR", prices: [{label: points+" Professional Points", amount: stars}]}, function(s){ if(s=="paid"){ balance+=points; if(points>=2500) balance+=500; save(); ui(); alert('✓ Payment Successful! '+points+' Points Added. Transaction of '+stars+' ⭐ completed to @realreferralAdsbot'); } }); } else { if(confirm('Test Purchase: '+points+' Points for '+stars+' Stars?')){ balance+=points; if(points>=2500) balance+=500; save(); ui(); alert('✓ Test: '+points+' Points Added'); } } }
+function copyRef(){ let t=document.getElementById('ref').innerText; navigator.clipboard.writeText(t).then(()=>alert('✓ Professional invite link copied to clipboard')); }
+ui(); drawGate(); drawGroups(); drawMonet(); renderAll(); loadAll();
+if(window.Telegram?.WebApp){ Telegram.WebApp.ready(); Telegram.WebApp.expand(); }
+</script></body></html>

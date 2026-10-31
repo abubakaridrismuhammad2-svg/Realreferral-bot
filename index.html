@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="ha">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>V54.6 FULL - Overlay Ya Hau Kai - Ba a goge komai ba</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:Inter,system-ui,-apple-system}
+body{background:#F0F3F8;color:#0B1220;padding:12px;padding-bottom:140px}
+.header{background:#0B1220;color:#fff;border-radius:16px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.header b{font-size:18px}
+.card{background:#fff;border:1px solid #E8EDF3;border-radius:16px;padding:16px;margin:12px 0;box-shadow:0 2px 12px rgba(0,0,0,.04)}
+.card h3{font-size:14px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
+.pill{display:inline-block;padding:5px 12px;border-radius:99px;font-size:10px;font-weight:800;letter-spacing:.5px}
+.pill.dark{background:#0B1220;color:#fff}
+.pill.gold{background:#FFC700;color:#0B1220}
+.pill.green{background:#0FA958;color:#fff}
+.btn{border:none;padding:10px 16px;border-radius:12px;font-weight:800;cursor:pointer;font-size:12px}
+.btn.dark{background:#0B1220;color:#fff}
+.btn.gold{background:#FFC700;color:#0B1220}
+.btn:disabled{opacity:.5}
+.campaign{border:1px solid #E8EDF3;border-radius:14px;padding:12px;margin:8px 0;background:#fff;cursor:pointer;transition:.2s}
+.campaign:hover{border-color:#FFC700;transform:translateY(-1px)}
+.task{display:flex;justify-content:space-between;align-items:center;background:#F9FAFB;border:1px solid #E8EDF3;border-radius:12px;padding:10px 12px;margin:8px 0}
+small{color:#6B7A90;font-size:11px}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <b>🚀 Traffic App V54.6</b>
+  <div style="display:flex;gap:8px;align-items:center">
+    <span id="myPointsDisplay" class="pill gold">0 Points</span>
+    <span class="pill dark" id="myIdDisplay">ID: user123</span>
+  </div>
+</div>
+
+<!-- FEATURED CAMPAIGN - BA A GOGE BA -->
+<div class="card">
+  <h3>⭐ Featured Campaign <span class="pill green">Active</span></h3>
+  <div id="featuredList"></div>
+</div>
+
+<!-- DAILY TASKS 8 - MONETAG + ADSTERRA - BA A GOGE BA - +1 POINT = KUDI -->
+<div class="card">
+  <h3>🎯 Daily Tasks 8 - Monetag + Adsterra <span class="pill gold">+1 Point = Kudi</span></h3>
+  <div id="dailyTasksList"></div>
+  <div style="margin-top:10px;background:#FFFBEB;border:1px dashed #FFC700;border-radius:12px;padding:10px">
+    <small style="color:#92400E"><b>Yadda +1 Point = Kudi:</b> Mutum ya danna Task → Monetag/Adsterra sun kirga → $0.002 ya shiga dashboard dinka → Bayan 15s mutum ya samu +1 Point → Kowa ya ci moriya!</small>
+  </div>
+</div>
+
+<!-- MY CAMPAIGNS - ADS NA MUTANE - BA A GOGE BA -->
+<div class="card">
+  <h3>📢 My Campaigns - Ads na mutane <span class="pill dark" id="campaignCount">0 ads</span></h3>
+  <div id="myCampaignsList"></div>
+  <div style="margin-top:12px;display:flex;gap:8px">
+    <input id="newLinkInput" placeholder="https://link dinka - Dora ad" style="flex:1;padding:10px;border:1px solid #E8EDF3;border-radius:12px">
+    <button class="btn dark" onclick="addNewCampaign()">Dora +</button>
+  </div>
+  <small style="display:block;margin-top:8px">Danna ad na mutane → Overlay dinka zai hau KAI kamar Facebook → Sannan ad na mutum zai bude</small>
+</div>
+
+<!-- NATIVE BANNER - 332da3b1 - BA A GOGE BA - KARI -->
+<div class="card" style="border-color:#FFC700;border-width:2px;background:linear-gradient(135deg,#FFFBEB,#FFF)">
+  <div style="font-size:9px;font-weight:900;color:#92400E;letter-spacing:.8px;margin-bottom:8px">RECOMMENDED • YOUR REVENUE - NATIVE</div>
+  <div id="container-332da3b1ee19111d644126ca2b8b8d8b"></div>
+</div>
+<script async data-cfasync="false" src="https://pl31631640.profitableratecpmnetwork.com/332da3b1ee19111d644126ca2b8b8d8b/invoke.js"></script>
+
+<!-- ===== V54.6 OVERLAY - KARI KAWAI - YA HAU KAI - BA A GOGE KOMAI BA - FACEBOOK IN-STREAM ===== -->
+<div id="revenueOverlay" style="display:none;position:fixed;inset:0;z-index:99999;background:rgba(11,18,32,.88);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:18px">
+  <div style="position:relative;width:100%;max-width:400px;background:#fff;border-radius:22px;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.5);border:2px solid #FFC700">
+    
+    <div style="background:linear-gradient(135deg,#FFC700,#FFB800);padding:12px 16px;display:flex;justify-content:space-between;align-items:center">
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="background:#0B1220;color:#FFC700;padding:5px 12px;border-radius:99px;font-size:10px;font-weight:900">YOUR REVENUE</span>
+        <b style="font-size:12px;color:#0B1220">SPONSORED - Ya hau kai</b>
+      </div>
+      <button onclick="closeRevenueOverlay()" style="background:#0B1220;color:#fff;border:none;width:30px;height:30px;border-radius:50%;font-weight:800">✕</button>
+    </div>
+
+    <div style="position:relative;background:#F5F7FA;padding:14px;opacity:.55;filter:blur(1.2px)">
+      <div style="display:flex;gap:10px"><div style="width:48px;height:48px;background:#E8EDF3;border-radius:10px"></div><div><b style="font-size:13px">Ad na Mutum - Yana kasa</b><br><small>Blur - Naka ya hau kai kamar Facebook video</small></div></div>
+      <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center"><span style="background:rgba(11,18,32,.85);color:#fff;padding:7px 14px;border-radius:99px;font-size:11px;font-weight:800">Ad na mutum a kasa - Naka a kai • Facebook style</span></div>
+    </div>
+
+    <div style="padding:16px;background:#fff">
+      <div style="text-align:center;margin-bottom:10px"><span style="font-size:9px;font-weight:900;color:#6B7A90;letter-spacing:.8px">YOUR REVENUE AD - A KAN TALLAN MUTANE - KAMAR FACEBOOK IN-STREAM - OVERLAY</span></div>
+      <div style="display:flex;justify-content:center;background:#F9FAFB;border:1px solid #E8EDF3;border-radius:14px;padding:10px">
+        <div id="overlayAdSlot">
+          <script>atOptions={'key':'f02e54541815a60f9a07c0d03c891b8e','format':'iframe','height':250,'width':300,'params':{}};</script>
+          <script src="https://www.highrevenueformat.com/f02e54541815a60f9a07c0d03c891b8e/invoke.js"></script>
+        </div>
+      </div>
+      <div style="margin-top:14px;display:flex;gap:10px">
+        <button onclick="clickOverlayRevenueAndEarn()" style="flex:1;background:#0B1220;color:#fff;border:none;padding:13px;border-radius:12px;font-weight:900;font-size:13px">🎯 Open - +1 Point - Kudi a dashboard</button>
+        <button onclick="closeRevenueOverlay()" style="background:#F3F4F6;color:#0B1220;border:1px solid #E8EDF3;padding:13px 18px;border-radius:12px;font-weight:800">Rufe</button>
+      </div>
+      <div style="margin-top:12px;display:flex;justify-content:space-between;align-items:center">
+        <small>⏳ Auto rufe <b id="overlayCountdown">15</b>s - +1 Point</small>
+        <small style="color:#0FA958;font-weight:800">✓ Ba a goge komai ba - Kari ne</small>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== CONFIG - BA A GOGE BA =====
+let myId=localStorage.getItem('myId')||'user_'+Math.floor(Math.random()*10000);
+localStorage.setItem('myId',myId);
+document.getElementById('myIdDisplay').innerText='ID: '+myId;
+
+// ===== POINTS - BA A GOGE BA =====
+function addPoints(n){let p=parseInt(localStorage.getItem('myPoints')||'0');p+=n;localStorage.setItem('myPoints',p);document.getElementById('myPointsDisplay').innerText=p+' Points';return p;}
+addPoints(0);
+
+// ===== MONETAG + ADSTERRA - DAILY 8 - BA A GOGE BA =====
+let monetLinks=[
+ "https://www.profitableratecpmnetwork.com/rg9frw0b?key=3a285a0baa1bd805086b878c9945749a",
+ "https://www.profitableratecpmnetwork.com/jipcgnfd?key=79a72cee205f810d60114be4f4761dd1",
+ "https://www.profitableratecpmnetwork.com/bmdtadg5pg?key=66bda5e5e2e88b4c29fffd6cc217a6ae",
+ "https://www.profitableratecpmnetwork.com/kxibh57f73?key=af241f4ce58f6d75267ae7f41fe07ae2",
+ "https://omg10.com/4/11920289",
+ "https://omg10.com/4/11920288",
+ "https://omg10.com/4/11920287",
+ "https://omg10.com/4/10943082"
+];
+function drawDailyTasks(){
+  let el=document.getElementById('dailyTasksList'); let h='';
+  monetLinks.forEach((url,i)=>{
+    h+=`<div class="task"><div><b style="font-size:12px">Task ${i+1} - ${i<4?'Monetag':'Adsterra'} AD ${i+1}</b><br><small>${url.substring(0,38)}...</small></div><button class="btn dark" id="taskBtn${i}" onclick="clickDailyTask('${url}',${i})">Open +1</button></div>`;
+  });
+  el.innerHTML=h;
+}
+function clickDailyTask(url,i){
+  window.open(url,'_blank');
+  let btn=document.getElementById('taskBtn'+i);
+  let sec=15; btn.innerHTML='⏳ 15s'; btn.disabled=true;
+  let iv=setInterval(()=>{sec--; btn.innerHTML=`⏳ ${sec}s`; if(sec<=0){clearInterval(iv); addPoints(1); btn.innerHTML='✅ +1'; btn.style.background='#0FA958';}},1000);
+}
+drawDailyTasks();
+
+// ===== MY CAMPAIGNS - BA A GOGE BA - FULL =====
+let myCampaigns=JSON.parse(localStorage.getItem('myCampaigns_'+myId)||'[]');
+if(myCampaigns.length==0){
+  myCampaigns=[
+    {id:'c1',title:'Wireless Headphones - ₦25,000',link:'https://example.com/headphones',remaining:18,total:20},
+    {id:'c2',title:'Running Sneakers - ₦18,500',link:'https://example.com/shoes',remaining:12,total:20},
+    {id:'c3',title:'Smart Watch - ₦42,000',link:'https://example.com/watch',remaining:20,total:20},
+    {id:'c4',title:'Travel Backpack - ₦12,000',link:'https://example.com/bag',remaining:5,total:20},
+  ];
+}
+function saveCampaigns(){localStorage.setItem('myCampaigns_'+myId,JSON.stringify(myCampaigns));}
+function drawMyCampaigns(){
+  let el=document.getElementById('myCampaignsList'); let h='';
+  myCampaigns.forEach(ad=>{
+    h+=`<div class="campaign" onclick="openAdWithOverlay('${ad.id}','${ad.link}')">
+      <div style="display:flex;justify-content:space-between;align-items:center"><b style="font-size:13px">${ad.title}</b><span class="pill dark">${ad.remaining}/${ad.total}</span></div>
+      <small>${ad.link} • ${ad.remaining} views remaining</small>
+      <div style="margin-top:8px"><span style="background:#0B1220;color:#fff;padding:6px 12px;border-radius:99px;font-size:11px">Danna - Overlay ya hau kai - Kamar Facebook</span></div>
+    </div>`;
+  });
+  el.innerHTML=h;
+  document.getElementById('campaignCount').innerText=myCampaigns.length+' ads';
+  document.getElementById('featuredList').innerHTML=myCampaigns.slice(0,2).map(a=>`<div class="campaign" style="background:linear-gradient(135deg,#FFFBEB,#FEF3C7);border-color:#FFC700"><b>${a.title}</b><br><small>${a.link} • Featured</small></div>`).join('');
+}
+function addNewCampaign(){
+  let link=document.getElementById('newLinkInput').value.trim();
+  if(!link) return alert('Saka link');
+  myCampaigns.unshift({id:'c'+Date.now(),title:'My Campaign - '+link.substring(0,20),link:link,remaining:20,total:20});
+  saveCampaigns(); drawMyCampaigns(); document.getElementById('newLinkInput').value='';
+}
+drawMyCampaigns();
+
+// ===== V54.6 OVERLAY - KARI KAWAI - YA HAU KAI - BA A GOGE KOMAI BA =====
+let revenueAds=[
+ "https://www.profitableratecpmnetwork.com/rg9frw0b?key=3a285a0baa1bd805086b878c9945749a",
+ "https://omg10.com/4/11920289",
+ "https://www.profitableratecpmnetwork.com/jipcgnfd?key=79a72cee205f810d60114be4f4761dd1",
+ "https://omg10.com/4/11920288"
+];
+let revIdx=0; let overlayTimer=null; let overlaySec=15; let pendingUserLink=null; let pendingUserId=null;
+
+function openAdWithOverlay(id,link){
+  pendingUserLink=link; pendingUserId=id;
+  showRevenueOverlay();
+}
+function showRevenueOverlay(){
+  document.getElementById('revenueOverlay').style.display='flex';
+  overlaySec=15; document.getElementById('overlayCountdown').innerText=overlaySec;
+  overlayTimer=setInterval(()=>{overlaySec--; document.getElementById('overlayCountdown').innerText=overlaySec; if(overlaySec<=0){closeRevenueOverlayAndOpenUserAd();}},1000);
+}
+function closeRevenueOverlay(){
+  document.getElementById('revenueOverlay').style.display='none'; clearInterval(overlayTimer); pendingUserLink=null; pendingUserId=null;
+}
+function closeRevenueOverlayAndOpenUserAd(){
+  document.getElementById('revenueOverlay').style.display='none'; clearInterval(overlayTimer);
+  if(pendingUserLink){
+    window.open(pendingUserLink,'_blank');
+    let ad=myCampaigns.find(a=>a.id==pendingUserId);
+    if(ad && ad.remaining>0){ad.remaining--; saveCampaigns(); drawMyCampaigns();}
+  }
+  addPoints(1);
+  pendingUserLink=null; pendingUserId=null;
+}
+function clickOverlayRevenueAndEarn(){
+  let url=revenueAds[revIdx]; window.open(url,'_blank'); revIdx=(revIdx+1)%revenueAds.length; addPoints(1); closeRevenueOverlayAndOpenUserAd();
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ha">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>V54.6 - Overlay - Ya hau kai - Ba a goge komai ba</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:Inter,system-ui}
+body{background:#F5F7FA;padding:14px;padding-bottom:120px}
+.card{background:#fff;border:1px solid #E8EDF3;border-radius:16px;padding:14px;margin:12px 0}
+.pill{display:inline-block;padding:4px 10px;border-radius:99px;font-size:10px;font-weight:800}
+.pill.dark{background:#0B1220;color:#fff}
+.pill.gold{background:#FFC700;color:#0B1220}
+.campaign-card{background:#fff;border:1px solid #E8EDF3;border-radius:16px;padding:14px;margin:10px 0;cursor:pointer}
+.campaign-card:hover{border-color:#FFC700}
+.btn{border:none;padding:10px 14px;border-radius:12px;font-weight:800;cursor:pointer}
+.btn.dark{background:#0B1220;color:#fff}
+.btn.gold{background:#FFC700;color:#0B1220}
+</style>
+</head>
+<body>
+
+<!-- DAILY TASKS 8 - YADDA YAKE A V54 - BA A GOGE BA -->
+<div class="card">
+  <b>🎯 Daily Tasks 8 - Monetag + Adsterra - +1 Point = Kudi</b>
+  <div id="dailyTasks" style="margin-top:10px"></div>
+  <small style="color:#6B7A90">Kowane click - Kudi a dashboard dinka - +1 Point ga user</small>
+</div>
+
+<!-- MY CAMPAIGNS - ADS NA MUTANE - YADDA YAKE A V54 - BA A GOGE BA -->
+<div class="card">
+  <div style="display:flex;justify-content:space-between;align-items:center">
+    <b>📢 My Campaigns - Ads na mutane</b>
+    <span id="myPoints" class="pill gold">0 Points</span>
+  </div>
+  <div id="myCampaignsList" style="margin-top:12px"></div>
+</div>
+
+<!-- V54.6 - OVERLAY - KARI KAWAI - YA HAU KAI AKAN TALLAN MUTANE - KAMAR FACEBOOK - BA A GOGE KOMAI BA -->
+<div id="revenueOverlay" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(11,18,32,.85);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:20px">
+  <div style="position:relative;width:100%;max-width:380px;background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.4);border:2px solid #FFC700">
+    <div style="background:linear-gradient(135deg,#FFC700,#FFB800);padding:12px 16px;display:flex;justify-content:space-between;align-items:center">
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="background:#0B1220;color:#FFC700;padding:4px 10px;border-radius:99px;font-size:10px;font-weight:900">YOUR REVENUE</span>
+        <b style="font-size:12px;color:#0B1220">SPONSORED - Ya hau kai</b>
+      </div>
+      <button onclick="closeRevenueOverlay()" style="background:#0B1220;color:#fff;border:none;width:28px;height:28px;border-radius:50%">✕</button>
+    </div>
+
+    <div style="position:relative;background:#F5F7FA;padding:14px;opacity:.6;filter:blur(1px)">
+      <div style="display:flex;gap:10px"><div style="width:48px;height:48px;background:#E8EDF3;border-radius:10px"></div><div><b style="font-size:13px">Ad na Mutum - Yana kasa</b><br><small style="color:#6B7A90">Blur - Naka ya hau kai kamar Facebook</small></div></div>
+      <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center"><span style="background:rgba(11,18,32,.8);color:#fff;padding:6px 12px;border-radius:99px;font-size:11px;font-weight:800">Ad na mutum a kasa - Naka a kai</span></div>
+    </div>
+
+    <div style="padding:16px;background:#fff">
+      <div style="text-align:center;margin-bottom:10px"><span style="font-size:10px;font-weight:800;color:#6B7A90">YOUR REVENUE AD - A KAN TALLAN MUTANE - KAMAR FACEBOOK IN-STREAM</span></div>
+      <div style="display:flex;justify-content:center;background:#F9FAFB;border-radius:12px;padding:8px">
+        <div id="overlayAdSlot">
+          <script>atOptions={'key':'f02e54541815a60f9a07c0d03c891b8e','format':'iframe','height':250,'width':300,'params':{}};</script>
+          <script src="https://www.highrevenueformat.com/f02e54541815a60f9a07c0d03c891b8e/invoke.js"></script>
+        </div>
+      </div>
+      <div style="margin-top:12px;display:flex;gap:10px">
+        <button onclick="clickOverlayRevenueAndEarn()" style="flex:1;background:#0B1220;color:#fff;border:none;padding:12px;border-radius:12px;font-weight:800;font-size:13px">🎯 Open - +1 Point - Kudi a dashboard</button>
+        <button onclick="closeRevenueOverlay()" style="background:#F3F4F6;color:#0B1220;border:1px solid #E8EDF3;padding:12px 16px;border-radius:12px;font-weight:800;font-size:13px">Rufe ✕</button>
+      </div>
+      <div style="margin-top:10px;display:flex;justify-content:space-between"><small style="color:#6B7A90;font-size:11px">⏳ Auto rufe <b id="overlayCountdown">15</b>s</small><small style="color:#0FA958;font-size:11px;font-weight:700">✓ Ba a goge komai ba</small></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== V54 - BA A GOGE KOMAI BA - DAILY TASKS 8 =====
+let monet=[
+ "https://www.profitableratecpmnetwork.com/rg9frw0b?key=3a285a0baa1bd805086b878c9945749a",
+ "https://www.profitableratecpmnetwork.com/jipcgnfd?key=79a72cee205f810d60114be4f4761dd1",
+ "https://www.profitableratecpmnetwork.com/bmdtadg5pg?key=66bda5e5e2e88b4c29fffd6cc217a6ae",
+ "https://www.profitableratecpmnetwork.com/kxibh57f73?key=af241f4ce58f6d75267ae7f41fe07ae2",
+ "https://omg10.com/4/11920289",
+ "https://omg10.com/4/11920288",
+ "https://omg10.com/4/11920287",
+ "https://omg10.com/4/10943082"
+];
+function drawDaily(){
+  let el=document.getElementById('dailyTasks');
+  let h='';
+  monet.forEach((u,i)=>{
+    h+=`<div style="display:flex;justify-content:space-between;align-items:center;background:#F9FAFB;border:1px solid #E8EDF3;border-radius:12px;padding:10px;margin:8px 0"><div><b style="font-size:12px">Task ${i+1} - Monetag/Adsterra</b><br><small style="color:#6B7A90">${u.substring(0,35)}...</small></div><button class="btn dark" style="font-size:11px" onclick="clickDaily('${u}',${i})">Open +1</button></div>`;
+  });
+  el.innerHTML=h;
+}
+function clickDaily(url,i){
+  window.open(url,'_blank');
+  let sec=15;
+  let b=event.target;
+  b.innerHTML='⏳ 15s'; b.disabled=true;
+  let iv=setInterval(()=>{sec--; b.innerHTML=`⏳ ${sec}s`; if(sec<=0){clearInterval(iv); addPoints(1); b.innerHTML='✅ +1'; b.style.background='#0FA958';}},1000);
+}
+drawDaily();
+
+// ===== POINTS - BA A GOGE BA =====
+function addPoints(n){
+  let p=parseInt(localStorage.getItem('myPoints')||'0'); p+=n;
+  localStorage.setItem('myPoints',p);
+  document.getElementById('myPoints').innerText=p+' Points';
+}
+addPoints(0);
+
+// ===== MY CAMPAIGNS - ADS NA MUTANE - BA A GOGE BA - SAMPLE =====
+let myId='user123';
+let sampleAds=[
+ {id:'ad1',title:'My Headphones - Wireless',link:'https://example.com/1',remaining:18,total_views:20},
+ {id:'ad2',title:'My Shoes - Running',link:'https://example.com/2',remaining:12,total_views:20},
+ {id:'ad3',title:'My Watch - Smart',link:'https://example.com/3',remaining:20,total_views:20},
+ {id:'ad4',title:'My Bag - Travel',link:'https://example.com/4',remaining:5,total_views:20},
+];
+function drawMyCampaigns(){
+  let el=document.getElementById('myCampaignsList');
+  let h='';
+  sampleAds.forEach(ad=>{
+    h+=`<div class="campaign-card" onclick="openAdWithOverlay('${ad.id}','${ad.link}')">
+      <div style="display:flex;justify-content:space-between"><b>${ad.title}</b><span class="pill dark">${ad.remaining} left</span></div>
+      <small style="color:#6B7A90">${ad.link} • ${ad.remaining}/${ad.total_views} remaining</small><br>
+      <span style="background:#0B1220;color:#fff;padding:6px 12px;border-radius:99px;font-size:11px;margin-top:8px;display:inline-block">Danna - Ad zai hau kai kamar Facebook</span>
+    </div>`;
+  });
+  el.innerHTML=h;
+}
+drawMyCampaigns();
+
+// ===== V54.6 - OVERLAY - KARI KAWAI - YA HAU KAI - BA A GOGE KOMAI BA =====
+let revenueAds=[
+ "https://www.profitableratecpmnetwork.com/rg9frw0b?key=3a285a0baa1bd805086b878c9945749a",
+ "https://omg10.com/4/11920289",
+ "https://www.profitableratecpmnetwork.com/jipcgnfd?key=79a72cee205f810d60114be4f4761dd1",
+ "https://omg10.com/4/11920288"
+];
+let revIdx=0; let overlayTimer=null; let overlaySec=15; let pendingUserLink=null;
+
+function openAdWithOverlay(id,link){
+  pendingUserLink=link;
+  // 1. DA FARKO - NUNA OVERLAY - YA HAU KAI - KAMAR FACEBOOK
+  showRevenueOverlay(id);
+}
+
+function showRevenueOverlay(userAdId){
+  document.getElementById('revenueOverlay').style.display='flex';
+  overlaySec=15;
+  document.getElementById('overlayCountdown').innerText=overlaySec;
+  overlayTimer=setInterval(()=>{
+    overlaySec--; document.getElementById('overlayCountdown').innerText=overlaySec;
+    if(overlaySec<=0){closeRevenueOverlayAndOpenUserAd();}
+  },1000);
+}
+
+function closeRevenueOverlay(){
+  document.getElementById('revenueOverlay').style.display='none';
+  clearInterval(overlayTimer);
+  pendingUserLink=null;
+}
+
+function closeRevenueOverlayAndOpenUserAd(){
+  document.getElementById('revenueOverlay').style.display='none';
+  clearInterval(overlayTimer);
+  if(pendingUserLink){
+    window.open(pendingUserLink,'_blank');
+    let ad=sampleAds.find(a=>a.link==pendingUserLink);
+    if(ad && ad.remaining>0){ad.remaining--; drawMyCampaigns();}
+  }
+  addPoints(1); // +1 Point saboda ya duba overlay
+  pendingUserLink=null;
+}
+
+function clickOverlayRevenueAndEarn(){
+  let url=revenueAds[revIdx];
+  window.open(url,'_blank');
+  revIdx=(revIdx+1)%revenueAds.length;
+  addPoints(1); // +1 Point - Kai ka samu kudi a dashboard
+  closeRevenueOverlayAndOpenUserAd();
+}
+</script>
+
+</body>
+</html>
